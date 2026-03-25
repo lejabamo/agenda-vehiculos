@@ -1,0 +1,38 @@
+# docker-compose.prod.yml
+# Override para producción (VPS)
+# Uso: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  db:
+    container_name: vehiculos_db
+    restart: always
+
+  backend:
+    container_name: vehiculos_backend
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    # No exponemos puertos al exterior, el proxy inverso / nginx interno lo maneja
+    ports: []
+
+  frontend:
+    container_name: vehiculos_nginx
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      # Definimos la base_url para Vite si es necesario
+      args:
+        - VITE_API_URL=/vehiculos/api/v1
+    restart: always
+    # Eliminamos la exposición del puerto 5174 local y usamos la red del proxy global
+    ports: []
+    networks:
+      - default
+      - agenda_network
+
+  mailpit:
+    profiles:
+      - dev
+
+networks:
+  agenda_network:
+    external: true

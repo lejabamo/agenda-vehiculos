@@ -1,0 +1,33 @@
+name: Deploy Agenda Vehículos to VPS
+
+on:
+  push:
+    branches:
+      - deploy/v1.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Asegurarse de que el directorio base exista e ir allí
+            mkdir -p /var/www/agenda-vehiculos
+            cd /var/www/agenda-vehiculos
+            
+            # Si el repo no está clonado, fallará. El usuario debe clonarlo por primera vez a mano.
+            git fetch origin deploy/v1.0
+            git reset --hard origin/deploy/v1.0
+            
+            # Construir y levantar contenedores en modo producción
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml build
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            
+            # Autolimpiar imágenes viejas sin uso para liberar espacio
+            docker image prune -f

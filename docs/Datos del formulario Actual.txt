@@ -1,0 +1,58 @@
+SOLICITUD DE VEHICULO SEDC
+leonardo.bastidas@cauca.gov.co Cambiar de cuenta
+ 
+No compartido
+ 
+* Indica que la pregunta es obligatoria
+Dependencia que realiza la solicitud 
+*
+Objeto de desplazamiento
+*
+Fecha de salida desplazamiento
+*
+Fecha
+Fecha de regreso desplazamiento 
+*
+Fecha
+Número de días del desplazamiento 
+*
+Municipio origen desplazamiento 
+*
+Municipio destino desplazamiento
+*
+Especifique lugar destino desplazamiento 
+*
+Nombres y apellidos completos - Comisionado 1
+*
+Cargo comisionado 1
+*
+Planta
+Contratista
+Otro
+Nombres y apellidos completos - Comisionado 2
+*
+Cargo comisionado 2
+*
+Planta
+Contratista
+Otro
+Nombres y apellidos completos - Comisionado 3
+*
+Cargo comisionado 3
+*
+Planta
+Contratista
+Otro
+Nombres y apellidos completos - Comisionado 4
+*
+Cargo comisionado 4
+*
+Planta
+Contratista
+Otro
+Nombres y apellidos funcionario líder dependencia
+*
+Correo electrónico para respuesta
+*
+Teléfono de contacto
+*

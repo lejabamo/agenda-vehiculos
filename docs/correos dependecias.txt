@@ -1,0 +1,44 @@
+#	Dependencia	Correo
+1	Secretaría de Educación y Cultura del Cauca	educacion@cauca.gov.co
+
+2	Subsecretaría de Educación y Cultura del Cauca	subsecretaria.educacion@cauca.gov.co
+
+3	Coordinación de Cultura Departamental	cultura@cauca.gov.co
+
+4	Oficina de Gestión de Calidad	gestiondecalidad@cauca.gov.co
+
+5	Oficina de Planeación Educativa	planeacioneducativa.educacion@cauca.gov.co
+
+6	Oficina de Inspección y Vigilancia	inspeccionyvigilancia.educacion@cauca.gov.co
+
+7	Oficina de Servicios Informáticos del Sector Educativo	serviciosinformaticos@cauca.gov.co
+
+8	Oficina Administrativa y Financiera	administrativayfinanciera.educacion@cauca.gov.co
+
+9	Oficina de Talento Humano	talentohumano.educacion@cauca.gov.co
+
+10	Servicio de Atención al Ciudadano y Correspondencia	sac.educacion@cauca.gov.co
+
+11	Oficina Escalafón	escalafon.educacion@cauca.gov.co
+
+12	Oficina de Prestaciones Sociales	prestacionessociales.educacion@cauca.gov.co
+
+13	Oficina de Nómina	nomina.educacion@cauca.gov.co
+
+14	Oficina de Historias Laborales	historiaslaborales.educacion@cauca.gov.co
+
+15	Oficina de Infraestructura Educativa	infraestructuraeducativa.educacion@cauca.gov.co
+
+16	Calidad Educativa	calidadeducativa@cauca.gov.co
+
+17	Oficina de Cobertura Educativa	coberturaeducativa@cauca.gov.co
+
+18	Oficina de Bienestar, Seguridad y Salud en el Trabajo	bienestarsst.educacion@cauca.gov.co
+
+19	Oficina Financiera	financiera.educacion@cauca.gov.co
+
+20	Oficina Jurídica de Educación	juridica.educacion@cauca.gov.co
+
+21	Unidad de Apoyo a la Gestión	unidadesdeapoyoalagestion@cauca.gov.co
+
+22	Comunicaciones	prensa.educacion@cauca.gov.co

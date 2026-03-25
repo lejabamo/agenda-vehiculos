@@ -1,0 +1,23 @@
+#	Líder	Dependencia
+1	SOR INÉS LARRAHONDO C.	Secretaría de Educación y Cultura del Cauca
+2	WANNER DARIO SUÁREZ M.	Subsecretaría de Educación y Cultura del Cauca
+3	CAROLA GRUESO	Coordinación de Cultura Departamental
+4	LUIS FELIPE PEÑA RIVERA	Oficina de Gestión de Calidad
+5	GUSTAVO ADOLFO HURTADO PAREDES	Oficina de Planeación Educativa
+6	ALIX EUGENIA BERMUDEZ BENAVIDES	Oficina de Inspección y Vigilancia
+7	LEONARDO BASTIDAS	Oficina de Servicios Informáticos del Sector Educativo
+8	PAOLA ANDREA MONTENEGRO ARBOLEDA	Oficina Administrativa y Financiera
+9	KELLY JOHANA IDROBO URIBE	Oficina de Talento Humano
+10	DANY SAMPER DÍAZ	Servicio de Atención al Ciudadano y Correspondencia
+11	JOSÉ RIASCOS	Oficina Escalafón
+12	JAIR ANDRÉS REINA	Oficina de Prestaciones Sociales
+13	MÓNICA PIEDAD RENGIFO	Oficina de Nómina
+14	RENNY FABIÁN LÓPEZ GÓMEZ	Oficina de Historias Laborales
+15	MILTON GUILLERMO MUÑOZ C.	Oficina de Infraestructura Educativa
+16	ADRIANA ESCOBAR	Calidad Educativa
+17	DELLY DELGADO	Oficina de Cobertura Educativa
+18	MARTHA LUCIA DUARTE SUAREZ	Oficina de Bienestar, Seguridad y Salud en el Trabajo
+19	PAOLA PRADO	Oficina Financiera
+20	SEVELING LUGO	Oficina Jurídica de Educación
+21	DERIAM DUBAN MUÑOZ BURBANO	Unidad de Apoyo a la Gestión
+22	MARY ALEXANDRA RAMÍREZ DÍAZ	Comunicaciones
