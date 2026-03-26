@@ -16,9 +16,20 @@ export default function Step4Contacto({ form, update, onNext, onPrev }: Props) {
   const validate = () => {
     const e: Record<string, string> = {}
     if (!form.lider_dependencia.trim()) e.lider = 'Ingrese el nombre del líder'
-    if (!form.email_respuesta.trim()) e.email = 'Ingrese el correo electrónico'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_respuesta)) e.email = 'Correo electrónico inválido'
-    if (!form.telefono_contacto.trim()) e.tel = 'Ingrese el teléfono de contacto'
+    
+    if (!form.email_respuesta.trim()) {
+      e.email = 'Ingrese el correo electrónico'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_respuesta)) {
+      e.email = 'Correo electrónico inválido'
+    }
+    
+    const phone = form.telefono_contacto.replace(/\D/g, '')
+    if (!phone) {
+      e.tel = 'Ingrese el teléfono de contacto'
+    } else if (phone.length < 7 || phone.length > 10) {
+      e.tel = 'El teléfono debe tener entre 7 y 10 dígitos'
+    }
+    
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -73,7 +84,8 @@ export default function Step4Contacto({ form, update, onNext, onPrev }: Props) {
             className={`form-input ${errors.tel ? 'error' : ''}`}
             placeholder="3XX XXX XXXX"
             value={form.telefono_contacto}
-            onChange={e => update({ telefono_contacto: e.target.value })}
+            maxLength={10}
+            onChange={e => update({ telefono_contacto: e.target.value.replace(/\D/g, '') })}
           />
           {errors.tel && <span className="form-error">{errors.tel}</span>}
         </div>
