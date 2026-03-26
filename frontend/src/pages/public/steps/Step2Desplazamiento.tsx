@@ -134,9 +134,6 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
     <>
       <h2 className="wizard-title">Datos del Desplazamiento</h2>
 
-      {/* Calendario de Disponibilidad */}
-      <Calendar onSelect={handleDateSelect} selectedStart={form.fecha_salida} selectedEnd={form.fecha_regreso} />
-
       <div className="form-row">
         <div className="form-group">
           <label className="form-label" htmlFor="fecha_salida">Fecha de salida <span className="required">*</span></label>
@@ -170,43 +167,18 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
         </div>
       )}
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="dependencia">Dependencia que realiza la solicitud <span className="required">*</span></label>
-        <Autocomplete
-          id="dependencia"
-          value={form.dependencia_nombre}
-          onChange={v => update({ dependencia_nombre: v, dependencia_id: null })}
-          onSelect={item => {
-            update({ dependencia_nombre: item.nombre, dependencia_id: item.id ?? null })
-            if (item.id) {
-              getLideres().then(lideres => {
-                const lider = lideres.find((l: any) => l.dependencia_id === item.id)
-                if (lider) {
-                  update({
-                    lider_dependencia: lider.nombre,
-                    email_respuesta: form.email_respuesta || lider.email || ''
-                  })
-                }
-              }).catch(() => {})
-            }
-          }}
-          fetch={getDependencias}
-          placeholder="Ej: Cobertura, UDAG, Calidad..."
-        />
-        {errors.dependencia && <span className="form-error">{errors.dependencia}</span>}
-      </div>
+      {/* Calendario de Disponibilidad */}
+      <Calendar onSelect={handleDateSelect} selectedStart={form.fecha_salida} selectedEnd={form.fecha_regreso} />
 
-      <div className="form-group">
-        <label className="form-label" htmlFor="objeto">Objeto del desplazamiento <span className="required">*</span></label>
-        <textarea
-          id="objeto"
-          className={`form-textarea ${errors.objeto ? 'error' : ''}`}
-          placeholder="Describa el motivo o actividad de la comisión"
-          value={form.objeto_desplazamiento}
-          onChange={e => update({ objeto_desplazamiento: e.target.value })}
-          rows={3}
-        />
-        {errors.objeto && <span className="form-error">{errors.objeto}</span>}
+      <div className="form-group" style={{ marginTop: '1.5rem' }}>
+        <label className="form-check">
+          <input
+            type="checkbox"
+            checked={form.fuera_departamento}
+            onChange={e => update({ fuera_departamento: e.target.checked, municipio_destino: '' })}
+          />
+          <span className="form-check-label">El destino es fuera del departamento del Cauca</span>
+        </label>
       </div>
 
       <div className="form-row">
@@ -247,14 +219,42 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
       </div>
 
       <div className="form-group">
-        <label className="form-check">
-          <input
-            type="checkbox"
-            checked={form.fuera_departamento}
-            onChange={e => update({ fuera_departamento: e.target.checked, municipio_destino: '' })}
-          />
-          <span className="form-check-label">El destino es fuera del departamento del Cauca</span>
-        </label>
+        <label className="form-label" htmlFor="dependencia">Dependencia que realiza la solicitud <span className="required">*</span></label>
+        <Autocomplete
+          id="dependencia"
+          value={form.dependencia_nombre}
+          onChange={v => update({ dependencia_nombre: v, dependencia_id: null })}
+          onSelect={item => {
+            update({ dependencia_nombre: item.nombre, dependencia_id: item.id ?? null })
+            if (item.id) {
+              getLideres().then(lideres => {
+                const lider = lideres.find((l: any) => l.dependencia_id === item.id)
+                if (lider) {
+                  update({
+                    lider_dependencia: lider.nombre,
+                    email_respuesta: form.email_respuesta || lider.email || ''
+                  })
+                }
+              }).catch(() => {})
+            }
+          }}
+          fetch={getDependencias}
+          placeholder="Ej: Cobertura, UDAG, Calidad..."
+        />
+        {errors.dependencia && <span className="form-error">{errors.dependencia}</span>}
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="objeto">Objeto del desplazamiento <span className="required">*</span></label>
+        <textarea
+          id="objeto"
+          className={`form-textarea ${errors.objeto ? 'error' : ''}`}
+          placeholder="Describa el motivo o actividad de la comisión"
+          value={form.objeto_desplazamiento}
+          onChange={e => update({ objeto_desplazamiento: e.target.value })}
+          rows={3}
+        />
+        {errors.objeto && <span className="form-error">{errors.objeto}</span>}
       </div>
 
       <div className="form-group">

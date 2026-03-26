@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.prod
       # Definimos la base_url para Vite si es necesario
       args:
-        - VITE_API_URL=/vehiculos/api/v1
+        - VITE_API_URL=/vehiculos/api
     restart: always
     # Eliminamos la exposición del puerto 5174 local y usamos la red del proxy global
     ports: []
