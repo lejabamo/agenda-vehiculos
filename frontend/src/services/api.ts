@@ -4,10 +4,20 @@ function authHeaders(token: string) {
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// ── Auth & Global Fetch ────────────────────────────────────────────────────────
+
+async function apiFetch(url: string, options: RequestInit = {}) {
+  const res = await fetch(url, options)
+  if (res.status === 401) {
+    localStorage.removeItem('token')
+    window.location.href = '/vehiculos/admin/login'
+    throw new Error('Sesión expirada')
+  }
+  return res
+}
 
 export async function login(email: string, password: string) {
-  const res = await fetch(`${BASE}/auth/login`, {
+  const res = await apiFetch(`${BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

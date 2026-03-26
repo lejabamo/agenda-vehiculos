@@ -1,10 +1,12 @@
 import sys
 import os
+import re
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from app.core.database import SessionLocal
 from app.models.dependencia import Dependencia
 from app.models.municipio import Municipio
+from app.models.lider import Lider
 
 data = """1 Secretaría de Educación y Cultura del Cauca educacion@cauca.gov.co
 2 Subsecretaría de Educación y Cultura del Cauca subsecretaria.educacion@cauca.gov.co
@@ -32,6 +34,7 @@ data = """1 Secretaría de Educación y Cultura del Cauca educacion@cauca.gov.co
 def run():
     db = SessionLocal()
     try:
+        # 1. Update Dependencias from data string
         lines = data.split('\n')
         for line in lines:
             if not line.strip(): continue
@@ -44,18 +47,33 @@ def run():
             if dep:
                 dep.nombre = nombre
                 dep.email = email
+            else:
+                db.add(Dependencia(id=dep_id, nombre=nombre, email=email, prioridad=99))
         
-        # Capitalize Municipios
+        # 2. Capitalize Municipios
         municipios = db.query(Municipio).all()
         for m in municipios:
-            # Capitalize each word properly e.g. "POPAYAN" -> "Popayán"
-            # But wait, original DB might not have accents like áéíóú. 
-            # Title case is good enough for now.
             if m.nombre:
                 m.nombre = m.nombre.title()
                 
+        # 3. Import Líderes from Lider-Dependencia.txt
+        lideres_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Lider-Dependencia.txt")
+        if os.path.exists(lideres_file):
+            db.query(Lider).delete() # wipe old to prevent duplicates
+            with open(lideres_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("#") or not line: continue
+                    parts = re.split(r'\t+', line)
+                    if len(parts) >= 3:
+                        nombre_lider = parts[1].strip()
+                        nombre_dep = parts[2].strip()
+                        dep = db.query(Dependencia).filter(Dependencia.nombre.ilike(f"%{nombre_dep}%")).first()
+                        if dep:
+                            db.add(Lider(nombre=nombre_lider, dependencia_id=dep.id))
+        
         db.commit()
-        print("Database updated successfully!")
+        print("Database dependencias and lideres populated successfully!")
     except Exception as e:
         db.rollback()
         print(f"Error: {e}")
