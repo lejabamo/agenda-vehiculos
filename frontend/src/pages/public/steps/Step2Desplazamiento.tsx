@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FormData } from '../PublicWizardPage'
-import { getMunicipios, getDependencias, getDisponibilidad } from '../../../services/api'
+import { getMunicipios, getDependencias, getDisponibilidad, getLideres } from '../../../services/api'
 import Autocomplete from '../../../components/Autocomplete'
 
 interface Props {
@@ -140,7 +140,20 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
           id="dependencia"
           value={form.dependencia_nombre}
           onChange={v => update({ dependencia_nombre: v, dependencia_id: null })}
-          onSelect={item => update({ dependencia_nombre: item.nombre, dependencia_id: item.id ?? null })}
+          onSelect={item => {
+            update({ dependencia_nombre: item.nombre, dependencia_id: item.id ?? null })
+            if (item.id) {
+              getLideres().then(lideres => {
+                const lider = lideres.find((l: any) => l.dependencia_id === item.id)
+                if (lider) {
+                  update({
+                    lider_dependencia: lider.nombre,
+                    email_respuesta: form.email_respuesta || lider.email || ''
+                  })
+                }
+              }).catch(() => {})
+            }
+          }}
           fetch={getDependencias}
           placeholder="Ej: Cobertura, UDAG, Calidad..."
         />

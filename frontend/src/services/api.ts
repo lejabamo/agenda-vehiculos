@@ -45,7 +45,7 @@ export async function createSolicitud(data: unknown) {
 
 export async function getLideres(q = '') {
   const res = await fetch(`${BASE}/solicitudes/lideres`)
-  const all = await res.json() as { id: number; nombre: string; dependencia: string }[]
+  const all = await res.json() as { id: number; nombre: string; dependencia: string; dependencia_id: number; email: string }[]
   return all.filter(l => l.nombre.toLowerCase().includes(q.toLowerCase()))
 }
 
