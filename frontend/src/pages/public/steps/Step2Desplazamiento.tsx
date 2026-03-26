@@ -134,6 +134,42 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
     <>
       <h2 className="wizard-title">Datos del Desplazamiento</h2>
 
+      {/* Calendario de Disponibilidad */}
+      <Calendar onSelect={handleDateSelect} selectedStart={form.fecha_salida} selectedEnd={form.fecha_regreso} />
+
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label" htmlFor="fecha_salida">Fecha de salida <span className="required">*</span></label>
+          <input
+            id="fecha_salida"
+            type="date"
+            className={`form-input ${errors.fecha_salida ? 'error' : ''}`}
+            value={form.fecha_salida}
+            min={new Date().toISOString().split('T')[0]}
+            onChange={e => update({ fecha_salida: e.target.value })}
+          />
+          {errors.fecha_salida && <span className="form-error">{errors.fecha_salida}</span>}
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="fecha_regreso">Fecha de regreso <span className="required">*</span></label>
+          <input
+            id="fecha_regreso"
+            type="date"
+            className={`form-input ${errors.fecha_regreso ? 'error' : ''}`}
+            value={form.fecha_regreso}
+            min={form.fecha_salida || new Date().toISOString().split('T')[0]}
+            onChange={e => update({ fecha_regreso: e.target.value })}
+          />
+          {errors.fecha_regreso && <span className="form-error">{errors.fecha_regreso}</span>}
+        </div>
+      </div>
+
+      {numDias > 0 && (
+        <div style={{ marginTop: '-0.75rem', marginBottom: '1.25rem', padding: '0.5rem 1rem', background: 'var(--color-info-bg)', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', color: 'var(--color-info)' }}>
+          📅 <strong>Duración:</strong> {numDias} {numDias === 1 ? 'día' : 'días'}
+        </div>
+      )}
+
       <div className="form-group">
         <label className="form-label" htmlFor="dependencia">Dependencia que realiza la solicitud <span className="required">*</span></label>
         <Autocomplete
@@ -172,42 +208,6 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
         />
         {errors.objeto && <span className="form-error">{errors.objeto}</span>}
       </div>
-
-      {/* Calendario de Disponibilidad */}
-      <Calendar onSelect={handleDateSelect} selectedStart={form.fecha_salida} selectedEnd={form.fecha_regreso} />
-
-      <div className="form-row">
-        <div className="form-group">
-          <label className="form-label" htmlFor="fecha_salida">Fecha de salida <span className="required">*</span></label>
-          <input
-            id="fecha_salida"
-            type="date"
-            className={`form-input ${errors.fecha_salida ? 'error' : ''}`}
-            value={form.fecha_salida}
-            min={new Date().toISOString().split('T')[0]}
-            onChange={e => update({ fecha_salida: e.target.value })}
-          />
-          {errors.fecha_salida && <span className="form-error">{errors.fecha_salida}</span>}
-        </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="fecha_regreso">Fecha de regreso <span className="required">*</span></label>
-          <input
-            id="fecha_regreso"
-            type="date"
-            className={`form-input ${errors.fecha_regreso ? 'error' : ''}`}
-            value={form.fecha_regreso}
-            min={form.fecha_salida || new Date().toISOString().split('T')[0]}
-            onChange={e => update({ fecha_regreso: e.target.value })}
-          />
-          {errors.fecha_regreso && <span className="form-error">{errors.fecha_regreso}</span>}
-        </div>
-      </div>
-
-      {numDias > 0 && (
-        <div style={{ marginTop: '-0.75rem', marginBottom: '1.25rem', padding: '0.5rem 1rem', background: 'var(--color-info-bg)', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', color: 'var(--color-info)' }}>
-          📅 <strong>Duración:</strong> {numDias} {numDias === 1 ? 'día' : 'días'}
-        </div>
-      )}
 
       <div className="form-row">
         <div className="form-group">
