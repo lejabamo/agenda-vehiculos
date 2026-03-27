@@ -60,42 +60,50 @@ export default function SolicitudDetailPage() {
       .finally(() => setLoading(false))
   }, [token, id])
 
+  // Efecto para verificar conflictos automáticamente cuando cambian los datos relevantes
+  useEffect(() => {
+    const runCheck = async () => {
+      if (!token || !sol || !modal) return
+      if (!['aprobar', 'reagendar'].includes(modal)) return
+
+      const vId = form.vehiculo_id
+      const cId = form.conductor_id
+      const desde = modal === 'reagendar' ? form.fecha_salida : sol.fecha_salida
+      const hasta = modal === 'reagendar' ? form.fecha_regreso : sol.fecha_regreso
+
+      if (!vId || !cId || !desde || !hasta) {
+        setConflict({ type: null, msg: '' })
+        return
+      }
+
+      try {
+        const res = await getVerificarCruce(token, {
+          vehiculo_id: vId,
+          conductor_id: cId,
+          desde,
+          hasta,
+          excluir_solicitud_id: sol.id
+        })
+
+        if (res.conflicto_vehiculo) {
+          setConflict({ type: 'V', msg: `El vehículo ya tiene una comisión aprobada del ${res.conflicto_vehiculo.desde} al ${res.conflicto_vehiculo.hasta} (Solicitud #${res.conflicto_vehiculo.id})` })
+        } else if (res.conflicto_conductor) {
+          setConflict({ type: 'C', msg: `El conductor ya tiene una comisión aprobada del ${res.conflicto_conductor.desde} al ${res.conflicto_conductor.hasta} (Solicitud #${res.conflicto_conductor.id})` })
+        } else {
+          setConflict({ type: null, msg: '' })
+        }
+      } catch (e) {
+        console.error('Error al verificar cruce:', e)
+      }
+    }
+
+    runCheck()
+  }, [token, sol, modal, form.vehiculo_id, form.conductor_id, form.fecha_salida, form.fecha_regreso])
+
   const fetchDiasLibres = async (vehiculoId: string) => {
     if (!token || !vehiculoId) return
     const res = await getDiasLibres(token, Number(vehiculoId))
     setDiasLibres(res.dias_libres || [])
-    checkConflict(vehiculoId, form.conductor_id)
-  }
-
-  const checkConflict = async (vId: string, cId: string) => {
-    if (!token || !sol) return
-    if (!vId || !cId) { setConflict({ type: null, msg: '' }); return }
-    
-    // Si estamos reagendando, usamos las nuevas fechas del form, si no, las de la solicitud
-    const desde = modal === 'reagendar' ? form.fecha_salida : sol.fecha_salida
-    const hasta = modal === 'reagendar' ? form.fecha_regreso : sol.fecha_regreso
-    
-    if (!desde || !hasta) return
-
-    try {
-      const res = await getVerificarCruce(token, {
-        vehiculo_id: vId,
-        conductor_id: cId,
-        desde,
-        hasta,
-        excluir_solicitud_id: sol.id
-      })
-
-      if (res.conflicto_vehiculo) {
-        setConflict({ type: 'V', msg: `El vehículo ya tiene una comisión aprobada del ${res.conflicto_vehiculo.desde} al ${res.conflicto_vehiculo.hasta} (Solicitud #${res.conflicto_vehiculo.id})` })
-      } else if (res.conflicto_conductor) {
-        setConflict({ type: 'C', msg: `el conductor ya tiene una comisión aprobada del ${res.conflicto_conductor.desde} al ${res.conflicto_conductor.hasta} (Solicitud #${res.conflicto_conductor.id})` })
-      } else {
-        setConflict({ type: null, msg: '' })
-      }
-    } catch (e) {
-      console.error(e)
-    }
   }
 
   const handleAction = async () => {
@@ -255,7 +263,7 @@ export default function SolicitudDetailPage() {
                   <div className="form-group">
                     <label className="form-label">Conductor a asignar</label>
                     <select className="form-select" value={form.conductor_id}
-                      onChange={e => { setForm(f => ({ ...f, conductor_id: e.target.value })); checkConflict(form.vehiculo_id, e.target.value) }}>
+                      onChange={e => setForm(f => ({ ...f, conductor_id: e.target.value }))}>
                       <option value="">Seleccione un conductor...</option>
                       {conductores.filter(c => c.activo).map(c => <option key={c.id} value={c.id}>{c.nombre} — {c.telefono}</option>)}
                     </select>
@@ -274,20 +282,12 @@ export default function SolicitudDetailPage() {
                    <div className="form-group">
                     <label className="form-label">Nueva fecha de salida</label>
                     <input type="date" className="form-input" value={form.fecha_salida}
-                      onChange={e => { 
-                        const v = e.target.value; 
-                        setForm(f => ({ ...f, fecha_salida: v })); 
-                        if (form.vehiculo_id && form.conductor_id) checkConflict(form.vehiculo_id, form.conductor_id) 
-                      }} />
+                      onChange={e => setForm(f => ({ ...f, fecha_salida: e.target.value }))} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Nueva fecha de regreso</label>
                     <input type="date" className="form-input" value={form.fecha_regreso}
-                      onChange={e => { 
-                        const v = e.target.value;
-                        setForm(f => ({ ...f, fecha_regreso: v })); 
-                        if (form.vehiculo_id && form.conductor_id) checkConflict(form.vehiculo_id, form.conductor_id) 
-                      }} />
+                      onChange={e => setForm(f => ({ ...f, fecha_regreso: e.target.value }))} />
                   </div>
                 </div>
               )}
