@@ -32,5 +32,8 @@ jobs:
             # Sincronizar nombres y líderes en la BD de forma automática
             docker exec vehiculos_backend python scripts/update_db.py
             
+            # Ingestar y sincronizar Instituciones Educativas (DUE)
+            docker exec vehiculos_backend python scripts/update_due.py
+            
             # Autolimpiar imágenes viejas sin uso para liberar espacio
             docker image prune -f

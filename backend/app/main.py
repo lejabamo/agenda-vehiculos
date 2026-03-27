@@ -4,10 +4,10 @@ from app.core.config import settings
 from app.core.database import engine, SessionLocal, Base
 
 # Import all models so Alembic/metadata are aware of them
-from app.models import dependencia, vehiculo, conductor, municipio, usuario, solicitud  # noqa
+from app.models import dependencia, vehiculo, conductor, municipio, usuario, solicitud, institucion_educativa  # noqa
 
 # Routers
-from app.routers import auth, solicitudes, vehiculos, conductores, dependencias, municipios, admin, analytics, directorio
+from app.routers import auth, solicitudes, vehiculos, conductores, dependencias, municipios, admin, analytics, directorio, instituciones
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -29,6 +29,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticación"])
 app.include_router(solicitudes.router, prefix="/api/solicitudes", tags=["Solicitudes"])
 app.include_router(municipios.router, prefix="/api/municipios", tags=["Municipios"])
+app.include_router(instituciones.router, prefix="/api/instituciones", tags=["Instituciones Educativas"])
 app.include_router(dependencias.router, prefix="/api/dependencias", tags=["Dependencias"])
 app.include_router(vehiculos.router, prefix="/api/admin/vehiculos", tags=["Admin - Vehículos"])
 app.include_router(conductores.router, prefix="/api/admin/conductores", tags=["Admin - Conductores"])

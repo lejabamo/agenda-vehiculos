@@ -6,7 +6,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy import Table
 from app.core.database import Base
+
+solicitud_institucion_asociacion = Table(
+    "solicitudes_instituciones",
+    Base.metadata,
+    Column("solicitud_id", Integer, ForeignKey("solicitudes.id", ondelete="CASCADE"), primary_key=True),
+    Column("institucion_dane", String(20), ForeignKey("instituciones_educativas.codigo_dane", ondelete="CASCADE"), primary_key=True)
+)
 
 
 class EstadoSolicitud(str, enum.Enum):
@@ -73,6 +81,12 @@ class Solicitud(Base):
     # Relación con comisionados
     comisionados = relationship("Comisionado", back_populates="solicitud", cascade="all, delete-orphan")
 
+    # Instituciones Educativas a visitar (opcional)
+    instituciones_visitadas = relationship(
+        "InstitucionEducativa",
+        secondary=solicitud_institucion_asociacion,
+        backref="solicitudes"
+    )
 
 class Comisionado(Base):
     __tablename__ = "comisionados"
