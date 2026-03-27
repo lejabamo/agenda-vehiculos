@@ -56,9 +56,22 @@ def run():
             if m.nombre:
                 m.nombre = m.nombre.title()
                 
-        # 3. Import Líderes from Lider-Dependencia.txt
-        lideres_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Lider-Dependencia.txt")
-        if os.path.exists(lideres_file):
+        # 3. Import Líderes from Lider-Dependencia.txt (searching multiple paths)
+        possible_paths = [
+            os.path.join(os.getcwd(), "Lider-Dependencia.txt"),
+            os.path.join(os.getcwd(), "docs", "Lider-Dependencia.txt"),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "Lider-Dependencia.txt"),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "Lider-Dependencia.txt"),
+        ]
+        
+        lideres_file = None
+        for p in possible_paths:
+            if os.path.exists(p):
+                lideres_file = p
+                print(f"   🔎 Encontrado Líderes en: {p}")
+                break
+                
+        if lideres_file:
             db.query(Lider).delete() # wipe old to prevent duplicates
             with open(lideres_file, "r", encoding="utf-8") as f:
                 for line in f:
