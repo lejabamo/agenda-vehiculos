@@ -68,13 +68,13 @@ export async function getDisponibilidad(desde: string, hasta: string) {
 
 export async function getSolicitudes(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString()
-  const res = await fetch(`${BASE}/admin/solicitudes?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/solicitudes?${qs}`, { headers: authHeaders(token) })
   if (!res.ok) throw new Error('Error al obtener solicitudes')
   return res.json()
 }
 
 export async function getSolicitudAdmin(token: string, id: number) {
-  const res = await fetch(`${BASE}/admin/solicitudes/${id}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/solicitudes/${id}`, { headers: authHeaders(token) })
   if (!res.ok) throw new Error('Error al obtener solicitud')
   return res.json()
 }
@@ -121,26 +121,26 @@ export async function finalizarSolicitud(token: string, id: number) {
 
 export async function getDiasLibres(token: string, vehiculoId: number, desde?: string) {
   const qs = new URLSearchParams({ vehiculo_id: String(vehiculoId), ...(desde ? { desde } : {}) })
-  const res = await fetch(`${BASE}/admin/dias-libres?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/dias-libres?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 export async function getCalendario(token: string, desde?: string, hasta?: string) {
   const qs = new URLSearchParams({ ...(desde ? { desde } : {}), ...(hasta ? { hasta } : {}) })
-  const res = await fetch(`${BASE}/admin/calendario?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/calendario?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 export async function getVerificarCruce(token: string, params: Record<string, any>) {
   const qs = new URLSearchParams(params).toString()
-  const res = await fetch(`${BASE}/admin/verificar-cruce?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/verificar-cruce?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 // ── Admin: Vehículos ──────────────────────────────────────────────────────────
 
 export async function getVehiculos(token: string) {
-  const res = await fetch(`${BASE}/admin/vehiculos/`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/vehiculos/`, { headers: authHeaders(token) })
   return res.json()
 }
 
@@ -163,7 +163,7 @@ export async function updateVehiculo(token: string, id: number, data: unknown) {
 // ── Admin: Conductores ────────────────────────────────────────────────────────
 
 export async function getConductores(token: string) {
-  const res = await fetch(`${BASE}/admin/conductores/`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/conductores/`, { headers: authHeaders(token) })
   return res.json()
 }
 
@@ -194,24 +194,24 @@ export async function deleteConductor(token: string, id: number) {
 
 export async function getAnalyticsMunicipios(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString()
-  const res = await fetch(`${BASE}/admin/analytics/municipios?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/analytics/municipios?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 export async function getAnalyticsInstituciones(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString()
-  const res = await fetch(`${BASE}/admin/analytics/instituciones?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/analytics/instituciones?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 export async function getAnalyticsDependencias(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString()
-  const res = await fetch(`${BASE}/admin/analytics/dependencias?${qs}`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/analytics/dependencias?${qs}`, { headers: authHeaders(token) })
   return res.json()
 }
 
 export async function getAnalyticsResumen(token: string) {
-  const res = await fetch(`${BASE}/admin/analytics/resumen`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/analytics/resumen`, { headers: authHeaders(token) })
   return res.json()
 }
 
@@ -224,7 +224,7 @@ export function getExportUrl(_token: string, params: Record<string, string> = {}
 
 // ── Directorio (Admin) ────────────────────────────────────────────────────────
 export async function getAdminDirectorioDependencias(token: string) {
-  const res = await fetch(`${BASE}/admin/directorio/dependencias`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/directorio/dependencias`, { headers: authHeaders(token) })
   return res.json()
 }
 
@@ -255,7 +255,7 @@ export async function deleteAdminDirectorioDependencia(token: string, id: number
 }
 
 export async function getAdminDirectorioLideres(token: string) {
-  const res = await fetch(`${BASE}/admin/directorio/lideres`, { headers: authHeaders(token) })
+  const res = await apiFetch(`${BASE}/admin/directorio/lideres`, { headers: authHeaders(token) })
   return res.json()
 }
 
