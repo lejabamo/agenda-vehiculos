@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FormData } from '../PublicWizardPage'
-import { getMunicipios, getDependencias, getDisponibilidad, getLideres } from '../../../services/api'
+import { getMunicipios, getDependencias, getDisponibilidad, getLideres, getInstituciones } from '../../../services/api'
 import Autocomplete from '../../../components/Autocomplete'
 
 interface Props {
@@ -48,7 +48,7 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
 
         {days.map((d, i) => {
           const isSelected = d.iso === selectedStart || d.iso === selectedEnd || (selectedStart && selectedEnd && d.iso > selectedStart && d.iso < selectedEnd)
-          const isFull = d.info.ocupados >= 2
+          const isFull = d.info.estado === 'AGOTADO'
           const isWeekend = d.date.getDay() === 0 || d.date.getDay() === 6
           
           let statusClass = 'day-available'
@@ -259,12 +259,14 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
 
       <div className="form-group">
         <label className="form-label" htmlFor="lugar_detalle">Especifique el lugar de destino <span className="required">*</span></label>
-        <input
+        <Autocomplete
           id="lugar_detalle"
-          className={`form-input ${errors.lugar ? 'error' : ''}`}
-          placeholder="Ej: Institución Educativa La Esperanza, Sede Municipal"
           value={form.lugar_destino_detalle}
-          onChange={e => update({ lugar_destino_detalle: e.target.value })}
+          onChange={v => update({ lugar_destino_detalle: v })}
+          onSelect={item => update({ lugar_destino_detalle: item.nombre })}
+          fetch={(v) => getInstituciones({ municipio: form.municipio_destino, q: v })}
+          placeholder="Ej: Institución Educativa La Esperanza, Sede Municipal"
+          className={errors.lugar ? 'error' : ''}
         />
         {errors.lugar && <span className="form-error">{errors.lugar}</span>}
       </div>

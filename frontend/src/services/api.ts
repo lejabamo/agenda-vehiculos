@@ -38,6 +38,12 @@ export async function getDependencias(q = '') {
   return res.json()
 }
 
+export async function getInstituciones(params: Record<string, string> = {}) {
+  const qs = new URLSearchParams(params).toString()
+  const res = await fetch(`${BASE}/instituciones/?${qs}`)
+  return res.json()
+}
+
 // ── Solicitudes públicas ──────────────────────────────────────────────────────
 
 export async function createSolicitud(data: unknown) {

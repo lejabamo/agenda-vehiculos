@@ -145,7 +145,11 @@ def get_lideres(db: Session = Depends(get_db)):
 
 @router.get("/disponibilidad")
 def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
-    """Retorna un diccionario de {fecha: ocupacion} para el rango dado (max 2 vehiculos)."""
+    """Retorna un diccionario de {fecha: ocupacion} para el rango dado baseado na flota real."""
+    total_v = db.query(Vehiculo).filter(Vehiculo.activo == True).count()
+    if total_v == 0:
+        total_v = 2 # fallback
+        
     ocupados = db.query(
         Solicitud.fecha_salida,
         Solicitud.fecha_regreso
@@ -159,7 +163,6 @@ def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
     from datetime import timedelta
     res = {}
     curr = desde
-    total_vehiculos = 2 # Atencion al requerimiento "solo tenemos dos vehiculos"
     
     while curr <= hasta:
         count = 0
@@ -168,8 +171,8 @@ def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
                 count += 1
         res[curr.isoformat()] = {
             "ocupados": count,
-            "disponibles": max(0, total_vehiculos - count),
-            "estado": "AGOTADO" if count >= total_vehiculos else "DISPONIBLE"
+            "disponibles": max(0, total_v - count),
+            "estado": "AGOTADO" if count >= total_v else "DISPONIBLE"
         }
         curr += timedelta(days=1)
     

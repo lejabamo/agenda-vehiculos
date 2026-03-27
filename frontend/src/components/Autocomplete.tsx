@@ -9,10 +9,11 @@ interface Props {
   placeholder: string
   id?: string
   labelField?: string
+  className?: string
 }
 
 export default function Autocomplete({
-  value, onChange, onSelect, fetch: fetchData, placeholder, id, labelField
+  value, onChange, onSelect, fetch: fetchData, placeholder, id, labelField, className = ''
 }: Props) {
   const [items, setItems] = useState<any[]>([])
   const [open, setOpen] = useState(false)
@@ -40,7 +41,7 @@ export default function Autocomplete({
     <div className="autocomplete-wrapper" ref={ref}>
       <input
         id={id}
-        className="form-input"
+        className={`form-input ${className}`}
         value={value}
         onChange={e => onChange(e.target.value)}
         onFocus={() => { if (items.length) setOpen(true) }}
