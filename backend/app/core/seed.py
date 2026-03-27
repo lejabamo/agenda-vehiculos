@@ -67,7 +67,11 @@ def run_seed(db: Session):
         db.commit()
 
     # Dependencias - Updated from text file if available
-    docs_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs")
+    # Busca archivos en /app/docs (estándar Docker) o relativo al script
+    docs_path = "/app/docs"
+    if not os.path.exists(docs_path):
+        docs_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs")
+    
     correos_file = os.path.join(docs_path, "correos dependecias.txt")
     
     if os.path.exists(correos_file):

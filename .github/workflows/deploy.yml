@@ -35,5 +35,11 @@ jobs:
             # Ingestar y sincronizar Instituciones Educativas (DUE)
             docker exec vehiculos_backend python scripts/update_due.py
             
+            # GENERAR DATOS DE PRUEBA (Para estadísticas y auditoría)
+            docker exec vehiculos_backend python scripts/fake_data.py
+            
+            # REALIZAR TEST AUTOMATICO (Smoke test)
+            docker exec vehiculos_backend python scripts/smoke_test.py
+            
             # Autolimpiar imágenes viejas sin uso para liberar espacio
             docker image prune -f

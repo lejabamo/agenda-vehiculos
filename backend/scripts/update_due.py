@@ -51,7 +51,11 @@ def get_municipio_id(db, municipio_name, cache):
 
 def run():
     print("🚀 Iniciando ingestión de Instituciones Educativas (DUE)...")
-    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "docs", "DUE-24032026.xlsx")
+    
+    # Intentar /app/docs (Docker) o relativo
+    file_path = "/app/docs/DUE-24032026.xlsx"
+    if not os.path.exists(file_path):
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "docs", "DUE-24032026.xlsx")
     
     if not os.path.exists(file_path):
         print(f"❌ Error: No se encontró el archivo DUE en {file_path}")
