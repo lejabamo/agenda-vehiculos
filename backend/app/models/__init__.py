@@ -3,6 +3,6 @@ from .municipio import Municipio
 from .dependencia import Dependencia
 from .conductor import Conductor
 from .vehiculo import Vehiculo
-from .solicitud import Solicitud, SolicitudHistorial, Comisionado
+from .solicitud import Solicitud, Comisionado
 from .lider import Lider
 from .institucion_educativa import InstitucionEducativa
