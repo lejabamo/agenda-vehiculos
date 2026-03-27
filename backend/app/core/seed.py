@@ -128,3 +128,12 @@ def run_seed(db: Session):
         )
         db.add(admin_user)
         db.commit()
+
+if __name__ == "__main__":
+    from app.core.database import SessionLocal
+    db = SessionLocal()
+    try:
+        run_seed(db)
+        print("🌱 Seed finalizado con éxito.")
+    finally:
+        db.close()
