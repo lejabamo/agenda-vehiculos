@@ -405,7 +405,44 @@ def verificar_cruce(
     }
 
 
-# ── Días libres sugeridos ─────────────────────────────────────────────────────
+@router.get("/disponibilidad-global")
+def disponibilidad_global(
+    desde: date,
+    hasta: date,
+    excluir_solicitud_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+    _=Depends(get_current_user),
+):
+    """Retorna un resumen de ocupación de la flota para un rango de fechas."""
+    total_v = db.query(Vehiculo).filter(Vehiculo.activo == True).count()
+    
+    q_ocupados = db.query(Solicitud).filter(
+        Solicitud.estado == EstadoSolicitud.APROBADO,
+        Solicitud.fecha_salida <= hasta,
+        Solicitud.fecha_regreso >= desde
+    )
+    if excluir_solicitud_id:
+        q_ocupados = q_ocupados.filter(Solicitud.id != excluir_solicitud_id)
+        
+    ocupadas = q_ocupados.all()
+    v_ids_ocupados = set([s.vehiculo_id for s in ocupadas if s.vehiculo_id])
+    
+    # Detalle de quiénes están ocupando
+    detalles = []
+    for s in ocupadas:
+        detalles.append({
+            "id": s.id,
+            "dependencia": s.dependencia.nombre if s.dependencia else "N/A",
+            "desde": s.fecha_salida.isoformat(),
+            "hasta": s.fecha_regreso.isoformat()
+        })
+
+    return {
+        "total_vehiculos_activos": total_v,
+        "vehiculos_ocupados_count": len(v_ids_ocupados),
+        "disponibles": max(0, total_v - len(v_ids_ocupados)),
+        "solicitudes_conflicto": detalles
+    }
 
 @router.get("/dias-libres")
 def dias_libres(

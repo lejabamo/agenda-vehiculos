@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
-  getSolicitudAdmin, getVehiculos, getConductores, getDiasLibres, getVerificarCruce,
+  getSolicitudAdmin, getVehiculos, getConductores, getDiasLibres, getVerificarCruce, getDisponibilidadGlobal,
   aprobarSolicitud, rechazarSolicitud, cancelarSolicitud, reagendarSolicitud, finalizarSolicitud
 } from '../../services/api'
 
@@ -48,6 +48,18 @@ export default function SolicitudDetailPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [conflict, setConflict] = useState<{ type: 'V' | 'C' | null; msg: string }>({ type: null, msg: '' })
+  const [globalCheck, setGlobalCheck] = useState<{
+    total_vehiculos_activos: number;
+    vehiculos_ocupados_count: number;
+    disponibles: number;
+    solicitudes_conflicto: any[]
+  } | null>(null)
+  const [newDateCheck, setNewDateCheck] = useState<{
+    total_vehiculos_activos: number;
+    vehiculos_ocupados_count: number;
+    disponibles: number;
+    solicitudes_conflicto: any[]
+  } | null>(null)
 
   useEffect(() => {
     if (!token || !id) return
@@ -59,6 +71,16 @@ export default function SolicitudDetailPage() {
     ]).then(([s, v, c]) => { setSol(s); setVehiculos(v); setConductores(c) })
       .finally(() => setLoading(false))
   }, [token, id])
+
+  useEffect(() => {
+    if (sol && token && sol.estado === 'PENDIENTE') {
+      getDisponibilidadGlobal(token, { desde: sol.fecha_salida, hasta: sol.fecha_regreso, excluir_solicitud_id: sol.id })
+        .then(res => {
+          setGlobalCheck(res)
+        })
+        .catch(console.error)
+    }
+  }, [sol, token])
 
   // Efecto para verificar conflictos automáticamente cuando cambian los datos relevantes
   useEffect(() => {
@@ -99,6 +121,22 @@ export default function SolicitudDetailPage() {
 
     runCheck()
   }, [token, sol, modal, form.vehiculo_id, form.conductor_id, form.fecha_salida, form.fecha_regreso])
+
+  // Verificar disponibilidad global para NUEVAS fechas elegidas en modal
+  useEffect(() => {
+    if (!token || !sol || modal !== 'reagendar') return
+    if (!form.fecha_salida || !form.fecha_regreso) return
+    
+    const delay = setTimeout(() => {
+      getDisponibilidadGlobal(token, {
+        desde: form.fecha_salida,
+        hasta: form.fecha_regreso,
+        excluir_solicitud_id: sol.id
+      }).then(setNewDateCheck).catch(console.error)
+    }, 400)
+    
+    return () => clearTimeout(delay)
+  }, [token, sol, modal, form.fecha_salida, form.fecha_regreso])
 
   const fetchDiasLibres = async (vehiculoId: string) => {
     if (!token || !vehiculoId) return
@@ -160,14 +198,46 @@ export default function SolicitudDetailPage() {
         <span className={`badge ${BADGE[estado] || ''}`}>{estado}</span>
       </div>
 
-      {/* Acciones */}
       <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         {canAprobar && <button className="btn btn-success" onClick={() => { setModal('aprobar'); setForm(f => ({ ...f, vehiculo_id: '', conductor_id: '', observaciones: '' })) }}>✓ Aprobar</button>}
         {canFinalizar && <button className="btn btn-success" onClick={() => setModal('finalizar')}>🏁 Finalizar Comisión</button>}
         {canRechazar && <button className="btn btn-danger" onClick={() => setModal('rechazar')}>✕ Rechazar</button>}
-        {canReagendar && <button className="btn btn-accent" onClick={() => { setModal('reagendar'); setDiasLibres([]) }}>📅 Reagendar</button>}
+        {canReagendar && <button className="btn btn-accent" onClick={() => { setModal('reagendar'); setForm(f => ({ ...f, fecha_salida: sol.fecha_salida, fecha_regreso: sol.fecha_regreso, observaciones: '' })); setDiasLibres([]) }}>📅 Reagendar</button>}
         {canCancelar && <button className="btn btn-outline" onClick={() => setModal('cancelar')}>Cancelar</button>}
       </div>
+
+      {/* Alerta Temprana de Disponibilidad Global */}
+      {globalCheck && globalCheck.solicitudes_conflicto.length > 0 && (
+        <div style={{
+          background: 'rgba(255, 152, 0, 0.08)',
+          border: '1px solid #ff9800',
+          padding: '1.25rem',
+          borderRadius: '1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-start',
+          boxShadow: '0 4px 12px rgba(255, 152, 0, 0.1)'
+        }}>
+          <span style={{ fontSize: '1.75rem' }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <strong style={{ color: '#e65100', fontSize: '1rem' }}>¡Alerta! Estas fechas ya tienen reservaciones:</strong>
+            <p style={{ margin: '0.25rem 0 0.75rem 0', fontSize: '0.9rem', color: '#5d4037' }}>
+              La secretaría tiene <strong>{globalCheck.solicitudes_conflicto.length}</strong> comisiones aprobadas del {sol.fecha_salida} al {sol.fecha_regreso}.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {globalCheck.solicitudes_conflicto.map(c => (
+                <div key={c.id} style={{ fontSize: '0.85rem', color: '#4e342e' }}>
+                  • Reservada por la <strong>{c.dependencia}</strong> (Solicitud #{c.id})
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#e65100', fontWeight: 600 }}>
+              Quedan {globalCheck.disponibles} vehículos disponibles de {globalCheck.total_vehiculos_activos}.
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {/* Desplazamiento */}
@@ -278,18 +348,43 @@ export default function SolicitudDetailPage() {
               )}
 
               {modal === 'reagendar' && (
-                <div className="form-row">
-                   <div className="form-group">
-                    <label className="form-label">Nueva fecha de salida</label>
-                    <input type="date" className="form-input" value={form.fecha_salida}
-                      onChange={e => setForm(f => ({ ...f, fecha_salida: e.target.value }))} />
+                <>
+                  <div className="form-row">
+                     <div className="form-group">
+                      <label className="form-label">Nueva fecha de salida</label>
+                      <input type="date" className="form-input" value={form.fecha_salida}
+                        onChange={e => setForm(f => ({ ...f, fecha_salida: e.target.value }))} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Nueva fecha de regreso</label>
+                      <input type="date" className="form-input" value={form.fecha_regreso}
+                        onChange={e => setForm(f => ({ ...f, fecha_regreso: e.target.value }))} />
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Nueva fecha de regreso</label>
-                    <input type="date" className="form-input" value={form.fecha_regreso}
-                      onChange={e => setForm(f => ({ ...f, fecha_regreso: e.target.value }))} />
-                  </div>
-                </div>
+
+                  {newDateCheck && (
+                    <div style={{
+                      marginTop: '-0.5rem',
+                      marginBottom: '1rem',
+                      padding: '0.75rem',
+                      borderRadius: 8,
+                      background: newDateCheck.disponibles > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                      border: `1px solid ${newDateCheck.disponibles > 0 ? '#4caf50' : '#f44336'}`,
+                      display: 'flex',
+                      gap: '0.5rem',
+                      alignItems: 'center',
+                      fontSize: '0.85rem'
+                    }}>
+                      <span style={{ fontSize: '1.25rem' }}>{newDateCheck.disponibles > 0 ? '✅' : '❌'}</span>
+                      <div style={{ color: newDateCheck.disponibles > 0 ? '#2e7d32' : '#c62828', fontWeight: 600 }}>
+                        {newDateCheck.disponibles > 0 
+                          ? `FECHAS DISPONIBLES: Quedan ${newDateCheck.disponibles} vehículos para el rango sugerido.`
+                          : `¡SIN DISPONIBILIDAD!: Toda la flota está ocupada en estas nuevas fechas.`
+                        }
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {(modal !== 'finalizar') && (

@@ -137,6 +137,12 @@ export async function getVerificarCruce(token: string, params: Record<string, an
   return res.json()
 }
 
+export async function getDisponibilidadGlobal(token: string, params: Record<string, any>) {
+  const qs = new URLSearchParams(params).toString()
+  const res = await apiFetch(`${BASE}/admin/disponibilidad-global?${qs}`, { headers: authHeaders(token) })
+  return res.json()
+}
+
 // ── Admin: Vehículos ──────────────────────────────────────────────────────────
 
 export async function getVehiculos(token: string) {
