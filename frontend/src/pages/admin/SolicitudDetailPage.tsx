@@ -401,7 +401,12 @@ export default function SolicitudDetailPage() {
               <button
                 className={`btn ${['aprobar', 'reagendar', 'finalizar'].includes(modal) ? 'btn-success' : modal === 'rechazar' ? 'btn-danger' : 'btn-outline'}`}
                 onClick={handleAction}
-                disabled={saving || !!conflict.msg || ((modal === 'aprobar' || modal === 'reagendar') && (!form.vehiculo_id || !form.conductor_id))}
+                disabled={
+                  saving || 
+                  !!conflict.msg || 
+                  ((modal === 'aprobar' || modal === 'reagendar') && (!form.vehiculo_id || !form.conductor_id)) ||
+                  (modal === 'reagendar' && newDateCheck?.disponibles === 0)
+                }
               >
                 {saving ? <><span className="spinner spinner-sm" /> Guardando...</> : 'Confirmar'}
               </button>
