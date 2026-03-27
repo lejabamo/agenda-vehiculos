@@ -49,17 +49,19 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
         {days.map((d, i) => {
           const isSelected = d.iso === selectedStart || d.iso === selectedEnd || (selectedStart && selectedEnd && d.iso > selectedStart && d.iso < selectedEnd)
           const isFull = d.info.estado === 'AGOTADO'
+          const isBusy = d.info.ocupados > 0 && !isFull
           const isWeekend = d.date.getDay() === 0 || d.date.getDay() === 6
           
           let statusClass = 'day-available'
           if (isFull) statusClass = 'day-full'
+          else if (isBusy) statusClass = 'day-busy'
           else if (isWeekend) statusClass = 'day-holiday'
 
           return (
             <div
               key={i}
               className={`calendar-day ${statusClass} ${isSelected ? 'selected' : ''}`}
-              title={`${d.info.ocupados} vehículos ocupados`}
+              title={`${d.info.ocupados} vehículos ocupados de ${d.info.ocupados + d.info.disponibles}`}
               onClick={() => !isFull && onSelect(d.iso)}
             >
               {d.date.getDate()}
@@ -73,8 +75,12 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
           <span>Disponible</span>
         </div>
         <div className="indicator-item">
+          <div className="indicator-box" style={{ background: 'var(--color-warning-bg)', borderColor: '#ffccbc' }} />
+          <span>Comprometido</span>
+        </div>
+        <div className="indicator-item">
           <div className="indicator-box" style={{ background: '#f1f5f9', borderColor: '#e2e8f0' }} />
-          <span>Fin de semana / Festivo</span>
+          <span>Fin de semana</span>
         </div>
         <div className="indicator-item">
           <div className="indicator-box" style={{ background: 'var(--color-primary-dark)', borderColor: 'var(--color-primary-dark)' }} />

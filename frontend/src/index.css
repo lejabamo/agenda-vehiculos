@@ -731,6 +731,15 @@ a:hover { text-decoration: underline; }
 .day-holiday:hover { background: #e2e8f0; }
 .day-holiday.selected { background: var(--color-primary); color: white; border-color: var(--color-primary-dark); }
 
+/* Naranja: Comprometido (Hay alguna reserva pero no flota llena) */
+.day-busy {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-color: #ffccbc;
+}
+.day-busy:hover { background: #ffccbc; }
+.day-busy.selected { background: var(--color-warning); color: white; border-color: #e64a19; }
+
 /* Azul Oscuro: Ocupado (No disponible) con texto Amarillo */
 .day-full {
   background: var(--color-primary-dark);
