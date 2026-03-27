@@ -2,6 +2,13 @@
 Seed data: 42 municipios del Cauca + dependencias SEDC recurrentes + conductores iniciales.
 Se ejecuta automáticamente al arrancar la app si las tablas están vacías.
 """
+import os
+import re
+import sys
+
+# Permitir que el script se ejecute directamente desde la raíz
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
 from sqlalchemy.orm import Session
 from app.models.municipio import Municipio
 from app.models.dependencia import Dependencia
@@ -9,8 +16,6 @@ from app.models.conductor import Conductor
 from app.models.usuario import Usuario
 from app.models.lider import Lider
 from app.core.security import get_password_hash
-import os
-import re
 
 # ---------------------------------------------------------------------------
 # 42 Municipios del Cauca (DANE - orden alfabético)
