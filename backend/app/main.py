@@ -7,7 +7,7 @@ from app.core.database import engine, SessionLocal, Base
 from app.models import dependencia, vehiculo, conductor, municipio, usuario, solicitud, institucion_educativa  # noqa
 
 # Routers
-from app.routers import auth, solicitudes, vehiculos, conductores, dependencias, municipios, admin, analytics, directorio, instituciones
+from app.routers import auth, solicitudes, vehiculos, conductores, dependencias, municipios, admin, analytics, directorio, instituciones, usuarios
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -35,6 +35,7 @@ app.include_router(vehiculos.router, prefix="/api/admin/vehiculos", tags=["Admin
 app.include_router(conductores.router, prefix="/api/admin/conductores", tags=["Admin - Conductores"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin - Solicitudes"])
 app.include_router(analytics.router, prefix="/api/admin/analytics", tags=["Admin - Analytics"])
+app.include_router(usuarios.router, prefix="/api/admin/usuarios", tags=["Admin - Usuarios"])
 
 
 @app.on_event("startup")
