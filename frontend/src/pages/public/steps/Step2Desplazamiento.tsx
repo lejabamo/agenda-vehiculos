@@ -12,22 +12,30 @@ interface Props {
 
 function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: string) => void, selectedStart: string, selectedEnd: string }) {
   const [disp, setDisp] = useState<Record<string, { ocupados: number; disponibles: number; estado: string }>>({})
-  const [range] = useState({ start: new Date(), end: new Date(Date.now() + 45 * 86400000) })
-
-  useEffect(() => {
-    const s = range.start.toISOString().split('T')[0]
-    const e = range.end.toISOString().split('T')[0]
-    getDisponibilidad(s, e).then(setDisp).catch(() => {})
-  }, [range])
-
-  const days = []
+  const [offset, setOffset] = useState(0) // offset en semanas
+  
   const today = new Date()
   today.setHours(0,0,0,0)
-  const startDayOfWeek = today.getDay() 
+  
+  // Calcular el rango visible basado en el offset
+  const viewStart = new Date(today)
+  viewStart.setDate(today.getDate() + (offset * 7))
+  
+  const viewEnd = new Date(viewStart)
+  viewEnd.setDate(viewStart.getDate() + 34)
+
+  useEffect(() => {
+    const s = viewStart.toISOString().split('T')[0]
+    const e = viewEnd.toISOString().split('T')[0]
+    getDisponibilidad(s, e).then(setDisp).catch(() => {})
+  }, [offset])
+
+  const days = []
+  const startDayOfWeek = viewStart.getDay() 
 
   for (let i = 0; i < 35; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
+    const d = new Date(viewStart)
+    d.setDate(viewStart.getDate() + i)
     const iso = d.toISOString().split('T')[0]
     const info = disp[iso] || { ocupados: 0, disponibles: 2, estado: 'DISPONIBLE' }
     days.push({ date: d, iso, info })
@@ -35,8 +43,23 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
 
   return (
     <div className="availability-calendar">
-      <div className="calendar-header">
-        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>📅 Disponibilidad de Vehículos (Próximos 35 días)</span>
+      <div className="calendar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <button 
+          className="btn btn-ghost btn-sm" 
+          onClick={() => setOffset(o => Math.max(0, o - 4))} 
+          disabled={offset <= 0}
+          title="Ver mes anterior"
+        >
+          ← Ant.
+        </button>
+        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>📅 Disponibilidad ({offset === 0 ? 'Actual' : `+${offset} semanas`})</span>
+        <button 
+          className="btn btn-ghost btn-sm" 
+          onClick={() => setOffset(o => o + 4)}
+          title="Ver mes siguiente"
+        >
+          Sig. →
+        </button>
       </div>
       <div className="calendar-grid">
         {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(n => <div key={n} className="calendar-day-name">{n}</div>)}
