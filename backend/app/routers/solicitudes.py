@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.models.solicitud import Solicitud, Comisionado, EstadoSolicitud, TipoVinculacion
 from app.models.lider import Lider
 from app.models.dependencia import Dependencia
+from app.models.vehiculo import Vehiculo
 from app.services.email_service import send_solicitud_received, send_notification
 
 router = APIRouter()
@@ -154,7 +155,7 @@ def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
         Solicitud.fecha_salida,
         Solicitud.fecha_regreso
     ).filter(
-        Solicitud.estado.in_([EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA]),
+        Solicitud.estado.in_([EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value]),
         Solicitud.fecha_salida <= hasta,
         Solicitud.fecha_regreso >= desde
     ).all()
