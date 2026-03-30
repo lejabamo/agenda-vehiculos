@@ -43,22 +43,35 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
 
   return (
     <div className="availability-calendar">
-      <div className="calendar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="calendar-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        background: '#f8fafc',
+        padding: '10px 15px',
+        borderRadius: '10px',
+        marginBottom: '15px'
+      }}>
         <button 
-          className="btn btn-ghost btn-sm" 
+          className="btn btn-outline btn-sm" 
+          style={{ background: offset > 0 ? '#fff' : 'transparent' }}
           onClick={() => setOffset(o => Math.max(0, o - 4))} 
           disabled={offset <= 0}
-          title="Ver mes anterior"
         >
           ← Ant.
         </button>
-        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>📅 Disponibilidad ({offset === 0 ? 'Actual' : `+${offset} semanas`})</span>
+        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-primary-dark)' }}>
+          {offset === 0 ? '🗓️ Mes Actual' : `🗓️ Disponibilidad (Futura)`}
+        </span>
         <button 
-          className="btn btn-ghost btn-sm" 
+          className="btn btn-primary btn-sm" 
           onClick={() => setOffset(o => o + 4)}
-          title="Ver mes siguiente"
+          style={{ 
+            boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)',
+            transition: 'all 0.2s'
+          }}
         >
-          Sig. →
+          Siguiente Mes →
         </button>
       </div>
       <div className="calendar-grid">
