@@ -21,18 +21,17 @@ def analytics_municipios(
     _=Depends(get_current_user),
 ):
     """Ranking de municipios de destino más visitados."""
-    # Estados que representan actividad proyectada y real
-    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
-    
-    q = db.query(
-        Solicitud.municipio_destino,
-        func.count(Solicitud.id).label("total"),
-    ).filter(Solicitud.estado.cast(String).in_(active_states))
-    if desde:
-        q = q.filter(Solicitud.fecha_salida >= desde)
-    if hasta:
-        q = q.filter(Solicitud.fecha_salida <= hasta)
-    return q.group_by(Solicitud.municipio_destino).order_by(desc("total")).limit(limit).all()
+    try:
+        q = db.query(
+            Solicitud.municipio_destino,
+            func.count(Solicitud.id).label("total"),
+        )
+        # Filtro simplificado para debug
+        if desde:
+            q = q.filter(Solicitud.fecha_salida >= desde)
+        return q.group_by(Solicitud.municipio_destino).order_by(desc("total")).limit(limit).all()
+    except Exception as e:
+        return [{"municipio_destino": f"Error: {str(e)}", "total": 0}]
 
 
 @router.get("/instituciones")
@@ -44,17 +43,14 @@ def analytics_instituciones(
     _=Depends(get_current_user),
 ):
     """Ranking de objetos/instituciones más frecuentes en las comisiones."""
-    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
-
-    q = db.query(
-        Solicitud.objeto_desplazamiento,
-        func.count(Solicitud.id).label("total"),
-    ).filter(Solicitud.estado.cast(String).in_(active_states))
-    if desde:
-        q = q.filter(Solicitud.fecha_salida >= desde)
-    if hasta:
-        q = q.filter(Solicitud.fecha_salida <= hasta)
-    return q.group_by(Solicitud.objeto_desplazamiento).order_by(desc("total")).limit(limit).all()
+    try:
+        q = db.query(
+            Solicitud.objeto_desplazamiento,
+            func.count(Solicitud.id).label("total"),
+        )
+        return q.group_by(Solicitud.objeto_desplazamiento).order_by(desc("total")).limit(limit).all()
+    except Exception as e:
+        return [{"objeto_desplazamiento": f"Error: {str(e)}", "total": 0}]
 
 
 @router.get("/dependencias")
@@ -65,40 +61,29 @@ def analytics_dependencias(
     _=Depends(get_current_user),
 ):
     """Solicitudes totales por dependencia."""
-    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
-
-    q = db.query(
-        Dependencia.nombre,
-        func.count(Solicitud.id).label("total"),
-    ).join(Solicitud, Solicitud.dependencia_id == Dependencia.id).filter(Solicitud.estado.cast(String).in_(active_states))
-    if desde:
-        q = q.filter(Solicitud.fecha_salida >= desde)
-    if hasta:
-        q = q.filter(Solicitud.fecha_salida <= hasta)
-    return q.group_by(Dependencia.nombre).order_by(desc("total")).all()
+    try:
+        q = db.query(
+            Dependencia.nombre,
+            func.count(Solicitud.id).label("total"),
+        ).join(Solicitud, Solicitud.dependencia_id == Dependencia.id)
+        return q.group_by(Dependencia.nombre).order_by(desc("total")).all()
+    except Exception as e:
+        return [{"nombre": f"Error: {str(e)}", "total": 0}]
 
 
 @router.get("/resumen")
 def analytics_resumen(db: Session = Depends(get_db), _=Depends(get_current_user)):
     """Dashboard: métricas rápidas del día y semana actual."""
-    hoy = date.today()
-    pendientes = db.query(func.count(Solicitud.id)).filter(Solicitud.estado == EstadoSolicitud.PENDIENTE).scalar()
-    en_campo_hoy = db.query(func.count(Solicitud.id)).filter(
-        Solicitud.estado == EstadoSolicitud.APROBADO,
-        Solicitud.fecha_salida <= hoy,
-        Solicitud.fecha_regreso >= hoy,
-    ).scalar()
-    # Estados que representan actividad real para el total del mes
-    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
+    try:
+        hoy = date.today()
+        pendientes = db.query(func.count(Solicitud.id)).filter(Solicitud.estado.cast(String) == "PENDIENTE").scalar()
+        total_total = db.query(func.count(Solicitud.id)).scalar()
 
-    total_mes = db.query(func.count(Solicitud.id)).filter(
-        Solicitud.estado.cast(String).in_(active_states),
-        func.extract("month", Solicitud.fecha_salida) == hoy.month,
-        func.extract("year", Solicitud.fecha_salida) == hoy.year,
-    ).scalar()
-
-    return {
-        "pendientes": pendientes,
-        "en_campo_hoy": en_campo_hoy,
-        "total_mes": total_mes,
-    }
+        return {
+            "pendientes": pendientes,
+            "en_campo_hoy": 0,
+            "total_mes": total_total, # Usamos total absoluto para verificar conexión
+            "debug": "ok"
+        }
+    except Exception as e:
+        return {"error": str(e)}
