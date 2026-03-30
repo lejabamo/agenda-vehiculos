@@ -789,20 +789,59 @@ a:hover { text-decoration: underline; }
 }
 .indicator-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.05); }
 
-/* ── Responsive ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .form-row, .form-row-3 { grid-template-columns: 1fr; }
-  .admin-layout { flex-direction: column; }
-  .sidebar { width: 100%; padding-top: var(--spacing-3); }
-  .sidebar-nav { display: flex; overflow-x: auto; padding: 0; }
-  .sidebar-nav-item { white-space: nowrap; padding: var(--spacing-3) var(--spacing-4); border-right: none; border-bottom: 3px solid transparent; }
-  .sidebar-nav-item.active { border-right: none; border-bottom-color: var(--color-accent); }
-  .wizard-content { padding: var(--spacing-5); }
-  .admin-main { padding: var(--spacing-4); }
-  .metrics-grid { grid-template-columns: 1fr 1fr; }
+/* ── Accesibilidad & Navegación Estándar ─────── */
+:focus-visible {
+  outline: 3px solid var(--sidebar-active-bg);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
 }
+
+/* Tamaño de toque estándar (iOS/Android A11y) */
+button, select, input, .calendar-day, .nav-item {
+  min-height: 44px;
+}
+
+/* ── Diseño Adaptativo Progresivo ───────────── */
+@media (max-width: 1024px) {
+  .admin-layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; }
+}
+
+@media (max-width: 768px) {
+  .form-row, .form-row-3 { grid-template-columns: 1fr !important; gap: var(--spacing-4); }
+  
+  .wizard-card {
+    padding: var(--spacing-4) !important;
+    margin: var(--spacing-2) !important;
+  }
+  
+  .wizard-title { font-size: var(--font-size-2xl) !important; }
+  
+  .btn-lg { width: 100%; }
+  
+  .calendar-grid { gap: 1px !important; }
+  .calendar-day { height: 50px !important; }
+
+  /* Tablas responsivas */
+  .data-table-container { overflow-x: auto; }
+  
+  /* Analytics grid mobile focus */
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 @media (max-width: 480px) {
   .metrics-grid { grid-template-columns: 1fr; }
   .wizard-steps { gap: var(--spacing-2); }
   .wizard-step-label { display: none; }
+  .calendar-day { font-size: var(--font-size-xs); }
+}
+
+/* Refuerzo de contraste si el sistema lo pide */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-secondary: #000;
+    --color-border: #000;
+  }
 }
