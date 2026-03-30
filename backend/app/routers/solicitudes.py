@@ -151,29 +151,49 @@ def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
     if total_v == 0:
         total_v = 2 # fallback
         
-    ocupados = db.query(
-        Solicitud.fecha_salida,
-        Solicitud.fecha_regreso
-    ).filter(
-        Solicitud.estado.in_([EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value]),
-        Solicitud.fecha_salida <= hasta,
-        Solicitud.fecha_regreso >= desde
+    # Consultar solicitudes APROBADAS (Ocupación Real)
+    reales = db.query(Solicitud.fecha_salida, Solicitud.fecha_regreso).filter(
+        Solicitud.estado.in_([EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]),
+        Solicitud.fecha_salida <= hasta, Solicitud.fecha_regreso >= desde
+    ).all()
+
+    # Consultar solicitudes PENDIENTES (Ocupación Estimada / Tomate)
+    pendientes = db.query(Solicitud.fecha_salida, Solicitud.fecha_regreso).filter(
+        Solicitud.estado == EstadoSolicitud.PENDIENTE,
+        Solicitud.fecha_salida <= hasta, Solicitud.fecha_regreso >= desde
     ).all()
 
     # Calcular ocupacion por dia
     from datetime import timedelta
     res = {}
     curr = desde
-    
     while curr <= hasta:
-        count = 0
-        for s_start, s_end in ocupados:
+        iso = curr.isoformat()
+        
+        # Ocupación firme
+        count_real = 0
+        for s_start, s_end in reales:
             if s_start <= curr <= s_end:
-                count += 1
-        res[curr.isoformat()] = {
-            "ocupados": count,
-            "disponibles": max(0, total_v - count),
-            "estado": "AGOTADO" if count >= total_v else "DISPONIBLE"
+                count_real += 1
+        
+        # Ocupación en trámite
+        count_pend = 0
+        for s_start, s_end in pendientes:
+            if s_start <= curr <= s_end:
+                count_pend += 1
+        
+        disp = total_v - count_real
+        estado = "DISPONIBLE"
+        if disp <= 0:
+            estado = "AGOTADO"
+        elif count_pend > 0:
+            estado = "COMPROMETIDO" # Activa color Tomate
+            
+        res[iso] = {
+            "ocupados": count_real,
+            "disponibles": max(0, disp),
+            "pendientes": count_pend,
+            "estado": estado
         }
         curr += timedelta(days=1)
     

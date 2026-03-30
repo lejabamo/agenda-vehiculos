@@ -85,7 +85,7 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
         {days.map((d, i) => {
           const isSelected = d.iso === selectedStart || d.iso === selectedEnd || (selectedStart && selectedEnd && d.iso > selectedStart && d.iso < selectedEnd)
           const isFull = d.info.estado === 'AGOTADO'
-          const isBusy = d.info.ocupados > 0 && !isFull
+          const isBusy = d.info.estado === 'COMPROMETIDO'
           const isWeekend = d.date.getDay() === 0 || d.date.getDay() === 6
           
           let statusClass = 'day-available'
