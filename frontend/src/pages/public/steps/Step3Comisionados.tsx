@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FormData } from '../PublicWizardPage'
 
 interface Props {
@@ -9,9 +10,31 @@ interface Props {
 
 type Comisionado = FormData['comisionados'][0]
 
+const CARGOS_PREDEFINIDOS = [
+  { label: 'PE. Profesional Especializado', value: 'PE. Profesional Especializado', tipo: 'PLANTA' },
+  { label: 'PU. Profesional Universitario', value: 'PU. Profesional Universitario', tipo: 'PLANTA' },
+  { label: 'TA. Técnico Administrativo', value: 'TA. Técnico Administrativo', tipo: 'PLANTA' },
+  { label: 'C. Contratista', value: 'C. Contratista', tipo: 'CONTRATISTA' },
+  { label: 'Otro...', value: 'OTRO', tipo: 'OTRO' }
+]
+
 export default function Step3Comisionados({ form, update, onNext, onPrev }: Props) {
-  const updateComisionado = (i: number, field: keyof Comisionado, val: string) => {
-    const updated = form.comisionados.map((c, idx) => idx === i ? { ...c, [field]: val } : c)
+  const updateComisionado = (i: number, field: keyof Comisionado | 'any', val: string) => {
+    const updated = form.comisionados.map((c, idx) => {
+      if (idx !== i) return c
+      
+      const newObj = { ...c, [field]: val }
+      
+      // Lógica de auto-selección de vinculación según el cargo
+      if (field === 'cargo') {
+        const found = CARGOS_PREDEFINIDOS.find(cp => cp.value === val)
+        if (found && found.tipo !== 'OTRO') {
+          newObj.tipo_vinculacion = found.tipo
+        }
+      }
+      
+      return newObj
+    })
     update({ comisionados: updated })
   }
 
@@ -46,7 +69,7 @@ export default function Step3Comisionados({ form, update, onNext, onPrev }: Prop
           </div>
 
           <div className="form-row">
-            <div className="form-group">
+            <div className="form-group" style={{ flex: 2 }}>
               <label className="form-label">Nombres y apellidos completos <span className="required">*</span></label>
               <input
                 className="form-input"
@@ -55,16 +78,35 @@ export default function Step3Comisionados({ form, update, onNext, onPrev }: Prop
                 onChange={e => updateComisionado(i, 'nombre_completo', e.target.value)}
               />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ flex: 1.5 }}>
               <label className="form-label">Cargo <span className="required">*</span></label>
-              <input
+              <select 
                 className="form-input"
-                placeholder="Cargo en la entidad"
-                value={c.cargo}
-                onChange={e => updateComisionado(i, 'cargo', e.target.value)}
-              />
+                value={CARGOS_PREDEFINIDOS.some(cp => cp.value === c.cargo) ? c.cargo : 'OTRO'}
+                onChange={e => {
+                  const val = e.target.value
+                  updateComisionado(i, 'cargo', val === 'OTRO' ? '' : val)
+                }}
+              >
+                <option value="">Seleccione cargo...</option>
+                {CARGOS_PREDEFINIDOS.map(cp => (
+                  <option key={cp.value} value={cp.value}>{cp.label}</option>
+                ))}
+              </select>
             </div>
           </div>
+
+          {/* Campo extra si elige OTRO */}
+          {!CARGOS_PREDEFINIDOS.filter(cp => cp.value !== 'OTRO').some(cp => cp.value === c.cargo) && c.cargo !== '' && (
+             <div className="form-group" style={{ marginTop: '-10px', marginBottom: '15px' }}>
+                <input
+                  className="form-input"
+                  placeholder="Especifique el cargo..."
+                  value={c.cargo}
+                  onChange={e => updateComisionado(i, 'cargo', e.target.value)}
+                />
+             </div>
+          )}
 
           <div className="form-group">
             <label className="form-label">Tipo de vinculación <span className="required">*</span></label>
