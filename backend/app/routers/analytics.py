@@ -22,7 +22,7 @@ def analytics_municipios(
 ):
     """Ranking de municipios de destino más visitados."""
     # Estados que representan actividad real (no cancelada ni rechazada)
-    active_states = [EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value, EstadoSolicitud.REAGENDADO.value]
+    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
 
     q = db.query(
         Solicitud.municipio_destino,
@@ -44,7 +44,7 @@ def analytics_instituciones(
     _=Depends(get_current_user),
 ):
     """Ranking de objetos/instituciones más frecuentes en las comisiones."""
-    active_states = [EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value, EstadoSolicitud.REAGENDADO.value]
+    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
 
     q = db.query(
         Solicitud.objeto_desplazamiento,
@@ -65,7 +65,7 @@ def analytics_dependencias(
     _=Depends(get_current_user),
 ):
     """Solicitudes totales por dependencia."""
-    active_states = [EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value, EstadoSolicitud.REAGENDADO.value]
+    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
 
     q = db.query(
         Dependencia.nombre,
@@ -89,7 +89,7 @@ def analytics_resumen(db: Session = Depends(get_db), _=Depends(get_current_user)
         Solicitud.fecha_regreso >= hoy,
     ).scalar()
     # Estados que representan actividad real para el total del mes
-    active_states = [EstadoSolicitud.APROBADO.value, EstadoSolicitud.FINALIZADA.value, EstadoSolicitud.REAGENDADO.value]
+    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
 
     total_mes = db.query(func.count(Solicitud.id)).filter(
         Solicitud.estado.in_(active_states),
