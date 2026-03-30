@@ -154,7 +154,7 @@ def get_disponibilidad(desde: date, hasta: date, db: Session = Depends(get_db)):
         Solicitud.fecha_salida,
         Solicitud.fecha_regreso
     ).filter(
-        Solicitud.estado == EstadoSolicitud.APROBADO,
+        Solicitud.estado.in_([EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA]),
         Solicitud.fecha_salida <= hasta,
         Solicitud.fecha_regreso >= desde
     ).all()
