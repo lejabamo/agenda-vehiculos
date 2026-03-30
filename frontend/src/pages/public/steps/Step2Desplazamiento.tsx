@@ -75,8 +75,8 @@ function Calendar({ onSelect, selectedStart, selectedEnd }: { onSelect: (d: stri
           <span>Disponible</span>
         </div>
         <div className="indicator-item">
-          <div className="indicator-box" style={{ background: 'var(--color-warning-bg)', borderColor: '#ffccbc' }} />
-          <span>Comprometido</span>
+          <div className="indicator-box" style={{ background: 'var(--color-warning-bg)', borderColor: '#FF6347' }} />
+          <span>Comprometido (Tomate)</span>
         </div>
         <div className="indicator-item">
           <div className="indicator-box" style={{ background: '#f1f5f9', borderColor: '#e2e8f0' }} />

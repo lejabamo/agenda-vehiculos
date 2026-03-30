@@ -54,10 +54,10 @@ def run():
             return
 
         print("   🏗️ Creando 40 solicitudes aleatorias para el histórico...")
-        # Histórico (Hace 2 meses al mes pasado) -> FINALIZADAS
-        for i in range(20):
-            d_out = date.today() - timedelta(days=random.randint(5, 60))
-            d_in = d_out + timedelta(days=random.randint(1, 3))
+        # Histórico (Hace 3 meses al mes pasado) -> FINALIZADAS
+        for i in range(25):
+            d_out = date.today() - timedelta(days=random.randint(5, 90))
+            d_in = d_out + timedelta(days=random.randint(0, 3))
             
             dep = random.choice(dependencias_list)
             muni = random.choice(municipios_list)
@@ -92,11 +92,11 @@ def run():
             db.add(Comisionado(solicitud_id=s.id, nombre_completo="Funcionario A", cargo="Técnico", tipo_vinculacion=TipoVinculacion.PLANTA))
             db.add(Comisionado(solicitud_id=s.id, nombre_completo="Funcionario B", cargo="Asesor", tipo_vinculacion=TipoVinculacion.CONTRATISTA))
 
-        # Futuro (Próximos 15 días) -> APROBADAS/PENDIENTES/REAGENDADAS
-        print("   📅 Creando 20 solicitudes próximas para calendario y Dashboard...")
-        for i in range(20):
-            d_out = date.today() + timedelta(days=random.randint(0, 15))
-            d_in = d_out + timedelta(days=random.randint(0, 2))
+        # Futuro (Ayer a Próximos 30 días) -> APROBADAS/PENDIENTES/REAGENDADAS
+        print("   📅 Creando 25 solicitudes próximas para calendario y Dashboard...")
+        for i in range(25):
+            d_out = date.today() + timedelta(days=random.randint(-1, 30))
+            d_in = d_out + timedelta(days=random.randint(0, 3))
             
             dep = random.choice(dependencias_list)
             muni = random.choice(municipios_list)
