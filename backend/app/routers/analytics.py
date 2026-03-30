@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, String
 from typing import Optional
 from datetime import date
 
@@ -21,13 +21,13 @@ def analytics_municipios(
     _=Depends(get_current_user),
 ):
     """Ranking de municipios de destino más visitados."""
-    # Estados que representan actividad real (no cancelada ni rechazada)
-    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
-
+    # Estados que representan actividad proyectada y real
+    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
+    
     q = db.query(
         Solicitud.municipio_destino,
         func.count(Solicitud.id).label("total"),
-    ).filter(Solicitud.estado.in_(active_states))
+    ).filter(Solicitud.estado.cast(String).in_(active_states))
     if desde:
         q = q.filter(Solicitud.fecha_salida >= desde)
     if hasta:
@@ -44,12 +44,12 @@ def analytics_instituciones(
     _=Depends(get_current_user),
 ):
     """Ranking de objetos/instituciones más frecuentes en las comisiones."""
-    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
+    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
 
     q = db.query(
         Solicitud.objeto_desplazamiento,
         func.count(Solicitud.id).label("total"),
-    ).filter(Solicitud.estado.in_(active_states))
+    ).filter(Solicitud.estado.cast(String).in_(active_states))
     if desde:
         q = q.filter(Solicitud.fecha_salida >= desde)
     if hasta:
@@ -65,12 +65,12 @@ def analytics_dependencias(
     _=Depends(get_current_user),
 ):
     """Solicitudes totales por dependencia."""
-    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
+    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
 
     q = db.query(
         Dependencia.nombre,
         func.count(Solicitud.id).label("total"),
-    ).join(Solicitud, Solicitud.dependencia_id == Dependencia.id).filter(Solicitud.estado.in_(active_states))
+    ).join(Solicitud, Solicitud.dependencia_id == Dependencia.id).filter(Solicitud.estado.cast(String).in_(active_states))
     if desde:
         q = q.filter(Solicitud.fecha_salida >= desde)
     if hasta:
@@ -89,10 +89,10 @@ def analytics_resumen(db: Session = Depends(get_db), _=Depends(get_current_user)
         Solicitud.fecha_regreso >= hoy,
     ).scalar()
     # Estados que representan actividad real para el total del mes
-    active_states = [EstadoSolicitud.APROBADO, EstadoSolicitud.FINALIZADA, EstadoSolicitud.REAGENDADO]
+    active_states = ["PENDIENTE", "APROBADO", "FINALIZADA", "REAGENDADO", "FINALIZADO"]
 
     total_mes = db.query(func.count(Solicitud.id)).filter(
-        Solicitud.estado.in_(active_states),
+        Solicitud.estado.cast(String).in_(active_states),
         func.extract("month", Solicitud.fecha_salida) == hoy.month,
         func.extract("year", Solicitud.fecha_salida) == hoy.year,
     ).scalar()
