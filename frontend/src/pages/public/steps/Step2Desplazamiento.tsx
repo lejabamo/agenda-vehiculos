@@ -307,7 +307,7 @@ export default function Step2Desplazamiento({ form, update, onNext, onPrev }: Pr
           onChange={v => update({ lugar_destino_detalle: v })}
           onSelect={item => update({ lugar_destino_detalle: item.nombre })}
           fetch={(v) => getInstituciones({ municipio: form.municipio_destino, q: v })}
-          placeholder="Ej: Institución Educativa La Esperanza, Sede Municipal"
+          placeholder="Ej: Escriba 'IE' o nombre para buscar colegios del municipio..."
           className={errors.lugar ? 'error' : ''}
         />
         {errors.lugar && <span className="form-error">{errors.lugar}</span>}
