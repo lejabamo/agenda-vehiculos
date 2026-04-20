@@ -33,32 +33,49 @@ export default function CalendarioPage() {
 
   return (
     <>
-      <h1 className="page-title">Calendario de Vehículos</h1>
+      <h1 className="page-title" id="page-heading">Calendario de Vehículos</h1>
       <p className="page-subtitle">Vista de ocupación de la flota</p>
 
       {loading ? (
-        <div style={{ padding: '3rem', textAlign: 'center' }}><div className="spinner" /></div>
+        <div style={{ padding: '3rem', textAlign: 'center' }} role="status"><div className="spinner" aria-label="Cargando calendario..." /></div>
       ) : events.length === 0 ? (
-        <div className="empty-state"><div className="empty-state-icon">📅</div><p>No hay comisiones programadas</p></div>
+        <div className="empty-state" role="status"><div className="empty-state-icon">📅</div><p>No hay comisiones programadas</p></div>
       ) : (
         <div className="card">
           <div className="card-body">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div 
+              style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }} 
+              role="list" 
+              aria-label="Cronograma de comisiones por fecha"
+            >
               {Object.entries(byDate).sort(([a],[b]) => a.localeCompare(b)).map(([fecha, evts]) => (
-                <div key={fecha} style={{ borderLeft: '3px solid var(--color-primary)', paddingLeft: '1rem' }}>
+                <div 
+                  key={fecha} 
+                  style={{ borderLeft: '3px solid var(--color-primary)', paddingLeft: '1rem' }} 
+                  role="listitem"
+                >
                   <div style={{ fontWeight: 700, color: 'var(--color-primary)', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                    <span className="sr-only">Fecha: </span>
                     📅 {new Date(fecha + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                   </div>
-                  {evts.map(e => (
-                    <div key={e.id} style={{
-                      background: COLOR[e.estado] || 'var(--color-text-muted)',
-                      color: 'white', borderRadius: 8, padding: '0.5rem 0.75rem',
-                      marginBottom: '0.375rem', fontSize: '0.8rem',
-                    }}>
-                      <div style={{ fontWeight: 600 }}>{e.title}</div>
-                      <div style={{ opacity: .85 }}>🚗 {e.vehiculo} — 👤 {e.conductor} | Hasta: {e.end}</div>
-                    </div>
-                  ))}
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    {evts.map(e => (
+                      <li key={e.id} style={{
+                        background: COLOR[e.estado] || 'var(--color-text-muted)',
+                        color: 'white', borderRadius: 8, padding: '0.5rem 0.75rem',
+                        marginBottom: '0.375rem', fontSize: '0.8rem',
+                      }}>
+                        <div style={{ fontWeight: 600 }}>{e.title}</div>
+                        <div style={{ opacity: .85 }}>
+                          <span className="sr-only">Vehículo: </span>🚗 {e.vehiculo} 
+                          <span style={{ margin: '0 0.25rem' }}>—</span>
+                          <span className="sr-only">Conductor: </span>👤 {e.conductor} 
+                          <span style={{ margin: '0 0.25rem' }}>|</span>
+                          <span className="sr-only">Finaliza el: </span>Hasta: {e.end}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>

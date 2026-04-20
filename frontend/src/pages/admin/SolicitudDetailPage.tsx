@@ -193,12 +193,12 @@ export default function SolicitudDetailPage() {
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/solicitudes')}>← Volver</button>
-        <h1 className="page-title" style={{ margin: 0 }}>Solicitud #{sol.id as number}</h1>
-        <span className={`badge ${BADGE[estado] || ''}`}>{estado}</span>
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/solicitudes')} aria-label="Volver a la lista de solicitudes">← Volver</button>
+        <h1 className="page-title" id="page-heading" style={{ margin: 0 }}>Solicitud #{sol.id as number}</h1>
+        <span className={`badge ${BADGE[estado] || ''}`} aria-label={`Estado actual: ${estado}`}>{estado}</span>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }} role="group" aria-label="Acciones de la solicitud">
         {canAprobar && <button className="btn btn-success" onClick={() => { setModal('aprobar'); setForm(f => ({ ...f, vehiculo_id: '', conductor_id: '', observaciones: '' })) }}>✓ Aprobar</button>}
         {canFinalizar && <button className="btn btn-success" onClick={() => setModal('finalizar')}>🏁 Finalizar Comisión</button>}
         {canRechazar && <button className="btn btn-danger" onClick={() => setModal('rechazar')}>✕ Rechazar</button>}
@@ -207,42 +207,44 @@ export default function SolicitudDetailPage() {
       </div>
 
       {/* Alerta Temprana de Disponibilidad Global */}
-      {globalCheck && globalCheck.solicitudes_conflicto.length > 0 && (
-        <div style={{
-          background: 'rgba(255, 152, 0, 0.08)',
-          border: '1px solid #ff9800',
-          padding: '1.25rem',
-          borderRadius: '1rem',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'flex-start',
-          boxShadow: '0 4px 12px rgba(255, 152, 0, 0.1)'
-        }}>
-          <span style={{ fontSize: '1.75rem' }}>⚠️</span>
-          <div style={{ flex: 1 }}>
-            <strong style={{ color: '#e65100', fontSize: '1rem' }}>¡Alerta! Estas fechas ya tienen reservaciones:</strong>
-            <p style={{ margin: '0.25rem 0 0.75rem 0', fontSize: '0.9rem', color: '#5d4037' }}>
-              La secretaría tiene <strong>{globalCheck.solicitudes_conflicto.length}</strong> comisiones aprobadas del {sol.fecha_salida} al {sol.fecha_regreso}.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {globalCheck.solicitudes_conflicto.map(c => (
-                <div key={c.id} style={{ fontSize: '0.85rem', color: '#4e342e' }}>
-                  • Reservada por la <strong>{c.dependencia}</strong> (Solicitud #{c.id})
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#e65100', fontWeight: 600 }}>
-              Quedan {globalCheck.disponibles} vehículos disponibles de {globalCheck.total_vehiculos_activos}.
+      <div aria-live="assertive" aria-relevant="all">
+        {globalCheck && globalCheck.solicitudes_conflicto.length > 0 && (
+          <div style={{
+            background: 'rgba(255, 152, 0, 0.08)',
+            border: '1px solid #ff9800',
+            padding: '1.25rem',
+            borderRadius: '1rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'flex-start',
+            boxShadow: '0 4px 12px rgba(255, 152, 0, 0.1)'
+          }}>
+            <span style={{ fontSize: '1.75rem' }} aria-hidden="true">⚠️</span>
+            <div style={{ flex: 1 }}>
+              <strong style={{ color: '#e65100', fontSize: '1rem' }}>¡Alerta! Estas fechas ya tienen reservaciones:</strong>
+              <p style={{ margin: '0.25rem 0 0.75rem 0', fontSize: '0.9rem', color: '#5d4037' }}>
+                La secretaría tiene <strong>{globalCheck.solicitudes_conflicto.length}</strong> comisiones aprobadas del {sol.fecha_salida} al {sol.fecha_regreso}.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {globalCheck.solicitudes_conflicto.map(c => (
+                  <div key={c.id} style={{ fontSize: '0.85rem', color: '#4e342e' }}>
+                    • Reservada por la <strong>{c.dependencia}</strong> (Solicitud #{c.id})
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#e65100', fontWeight: 600 }}>
+                Quedan {globalCheck.disponibles} vehículos disponibles de {globalCheck.total_vehiculos_activos}.
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {/* Desplazamiento */}
-        <div className="card">
-          <div className="card-header">📍 Desplazamiento</div>
+        <section className="card" aria-labelledby="header-desplazamiento">
+          <div className="card-header" id="header-desplazamiento">📍 Detalles del Desplazamiento</div>
           <div className="card-body" style={{ fontSize: '0.875rem' }}>
             <Info label="Dependencia" value={sol.dependencia} />
             <Info label="Objeto" value={sol.objeto_desplazamiento} />
@@ -253,11 +255,11 @@ export default function SolicitudDetailPage() {
             <Info label="Destino" value={sol.municipio_destino + (sol.fuera_departamento ? ' (Fuera del Cauca)' : '')} />
             <Info label="Lugar" value={sol.lugar_destino_detalle} />
           </div>
-        </div>
+        </section>
 
         {/* Contacto */}
-        <div className="card">
-          <div className="card-header">📧 Contacto</div>
+        <section className="card" aria-labelledby="header-contacto">
+          <div className="card-header" id="header-contacto">📧 Información de Contacto</div>
           <div className="card-body" style={{ fontSize: '0.875rem' }}>
             <Info label="Líder" value={sol.lider_dependencia} />
             <Info label="Email" value={sol.email_respuesta} />
@@ -266,15 +268,22 @@ export default function SolicitudDetailPage() {
             {sol.conductor && <Info label="Conductor" value={`${sol.conductor.nombre} (${sol.conductor.telefono})`} />}
             {sol.observaciones_admin && <Info label="Obs. Admin" value={sol.observaciones_admin} />}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* Comisionados */}
-      <div className="card" style={{ marginTop: '1rem' }}>
-        <div className="card-header">👥 Comisionados</div>
+      <section className="card" style={{ marginTop: '1rem' }} aria-labelledby="header-comisionados">
+        <div className="card-header" id="header-comisionados">👥 Personal Comisionado</div>
         <div className="table-wrapper">
           <table className="table">
-            <thead><tr><th>#</th><th>Nombre completo</th><th>Cargo</th><th>Vinculación</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nombre completo</th>
+                <th scope="col">Cargo</th>
+                <th scope="col">Vinculación</th>
+              </tr>
+            </thead>
             <tbody>
               {comisionados.map((c, i) => (
                 <tr key={i}>
@@ -287,28 +296,36 @@ export default function SolicitudDetailPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
       {/* Modales */}
       {modal && (
-        <div className="modal-overlay" onClick={() => setModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setModal(null)} role="presentation">
+          <div 
+            className="modal" 
+            onClick={e => e.stopPropagation()} 
+            role="dialog" 
+            aria-modal="true" 
+            aria-labelledby="modal-title"
+          >
             <div className="modal-header">
-              <span className="modal-title">
+              <span className="modal-title" id="modal-title">
                 {modal === 'aprobar' && '✓ Aprobar Solicitud'}
                 {modal === 'rechazar' && '✕ Rechazar Solicitud'}
                 {modal === 'cancelar' && 'Cancelar Solicitud'}
                 {modal === 'reagendar' && '📅 Reagendar Solicitud'}
                 {modal === 'finalizar' && '🏁 Finalizar Comisión'}
               </span>
-              <button className="btn btn-ghost btn-sm" onClick={() => setModal(null)}>✕</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setModal(null)} aria-label="Cerrar modal">✕</button>
             </div>
             <div className="modal-body">
-              {error && <div style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: 8, marginBottom: '1rem', fontWeight: 600, fontSize: '0.875rem' }}>⚠️ {error}</div>}
+              <div aria-live="polite">
+                {error && <div role="alert" style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: 8, marginBottom: '1rem', fontWeight: 600, fontSize: '0.875rem' }}>⚠️ {error}</div>}
+              </div>
 
               {modal === 'finalizar' && (
                 <div style={{ padding: '1rem 0' }}>
-                  <p>¿Está seguro que desea marcar esta comisión como **finalizada**?</p>
+                  <p>¿Está seguro que desea marcar esta comisión como <strong>finalizada</strong>?</p>
                   <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Esta acción liberará el vehículo para nuevas solicitudes.</p>
                 </div>
               )}
@@ -316,8 +333,8 @@ export default function SolicitudDetailPage() {
               {(modal === 'aprobar' || modal === 'reagendar') && (
                 <>
                   <div className="form-group">
-                    <label className="form-label">Vehículo a asignar</label>
-                    <select className="form-select" value={form.vehiculo_id}
+                    <label className="form-label" htmlFor="select-vehiculo">Vehículo a asignar</label>
+                    <select id="select-vehiculo" className="form-select" value={form.vehiculo_id}
                       onChange={e => { setForm(f => ({ ...f, vehiculo_id: e.target.value })); fetchDiasLibres(e.target.value) }}>
                       <option value="">Seleccione un vehículo...</option>
                       {vehiculos.filter(v => v.activo).map(v => <option key={v.id} value={v.id}>{v.placa} — {v.marca} {v.modelo}</option>)}
@@ -325,72 +342,76 @@ export default function SolicitudDetailPage() {
                   </div>
 
                   {diasLibres.length > 0 && (
-                    <div style={{ background: 'var(--color-info-bg)', padding: '0.75rem', borderRadius: 8, marginBottom: '0.75rem', fontSize: '0.8rem', color: 'var(--color-info)' }}>
+                    <div role="status" style={{ background: 'var(--color-info-bg)', padding: '0.75rem', borderRadius: 8, marginBottom: '0.75rem', fontSize: '0.8rem', color: 'var(--color-info)' }}>
                       📅 <strong>Días libres del vehículo:</strong> {diasLibres.slice(0, 5).join(', ')}
                     </div>
                   )}
 
                   <div className="form-group">
-                    <label className="form-label">Conductor a asignar</label>
-                    <select className="form-select" value={form.conductor_id}
+                    <label className="form-label" htmlFor="select-conductor">Conductor a asignar</label>
+                    <select id="select-conductor" className="form-select" value={form.conductor_id}
                       onChange={e => setForm(f => ({ ...f, conductor_id: e.target.value }))}>
                       <option value="">Seleccione un conductor...</option>
                       {conductores.filter(c => c.activo).map(c => <option key={c.id} value={c.id}>{c.nombre} — {c.telefono}</option>)}
                     </select>
                   </div>
 
-                  {conflict.msg && (
-                    <div style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '1rem', borderRadius: 8, marginBottom: '1rem', border: '1px solid var(--color-danger)', fontSize: '0.875rem' }}>
-                      ⚠️ <strong>¡Conflicto de Agenda!:</strong> {conflict.msg}
-                    </div>
-                  )}
+                  <div aria-live="assertive">
+                    {conflict.msg && (
+                      <div role="alert" style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '1rem', borderRadius: 8, marginBottom: '1rem', border: '1px solid var(--color-danger)', fontSize: '0.875rem' }}>
+                        ⚠️ <strong>¡Conflicto de Agenda!:</strong> {conflict.msg}
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
 
               {modal === 'reagendar' && (
                 <>
                   <div className="form-row">
-                     <div className="form-group">
-                      <label className="form-label">Nueva fecha de salida</label>
-                      <input type="date" className="form-input" value={form.fecha_salida}
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="input-salida">Nueva fecha de salida</label>
+                      <input id="input-salida" type="date" className="form-input" value={form.fecha_salida}
                         onChange={e => setForm(f => ({ ...f, fecha_salida: e.target.value }))} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Nueva fecha de regreso</label>
-                      <input type="date" className="form-input" value={form.fecha_regreso}
+                      <label className="form-label" htmlFor="input-regreso">Nueva fecha de regreso</label>
+                      <input id="input-regreso" type="date" className="form-input" value={form.fecha_regreso}
                         onChange={e => setForm(f => ({ ...f, fecha_regreso: e.target.value }))} />
                     </div>
                   </div>
 
-                  {newDateCheck && (
-                    <div style={{
-                      marginTop: '-0.5rem',
-                      marginBottom: '1rem',
-                      padding: '0.75rem',
-                      borderRadius: 8,
-                      background: newDateCheck.disponibles > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                      border: `1px solid ${newDateCheck.disponibles > 0 ? '#4caf50' : '#f44336'}`,
-                      display: 'flex',
-                      gap: '0.5rem',
-                      alignItems: 'center',
-                      fontSize: '0.85rem'
-                    }}>
-                      <span style={{ fontSize: '1.25rem' }}>{newDateCheck.disponibles > 0 ? '✅' : '❌'}</span>
-                      <div style={{ color: newDateCheck.disponibles > 0 ? '#2e7d32' : '#c62828', fontWeight: 600 }}>
-                        {newDateCheck.disponibles > 0 
-                          ? `FECHAS DISPONIBLES: Quedan ${newDateCheck.disponibles} vehículos para el rango sugerido.`
-                          : `¡SIN DISPONIBILIDAD!: Toda la flota está ocupada en estas nuevas fechas.`
-                        }
+                  <div aria-live="polite">
+                    {newDateCheck && (
+                      <div style={{
+                        marginTop: '-0.5rem',
+                        marginBottom: '1rem',
+                        padding: '0.75rem',
+                        borderRadius: 8,
+                        background: newDateCheck.disponibles > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                        border: `1px solid ${newDateCheck.disponibles > 0 ? '#4caf50' : '#f44336'}`,
+                        display: 'flex',
+                        gap: '0.5rem',
+                        alignItems: 'center',
+                        fontSize: '0.85rem'
+                      }}>
+                        <span style={{ fontSize: '1.25rem' }}>{newDateCheck.disponibles > 0 ? '✅' : '❌'}</span>
+                        <div style={{ color: newDateCheck.disponibles > 0 ? '#2e7d32' : '#c62828', fontWeight: 600 }}>
+                          {newDateCheck.disponibles > 0 
+                            ? `FECHAS DISPONIBLES: Quedan ${newDateCheck.disponibles} vehículos para el rango sugerido.`
+                            : `¡SIN DISPONIBILIDAD!: Toda la flota está ocupada en estas nuevas fechas.`
+                          }
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </>
               )}
 
               {(modal !== 'finalizar') && (
                 <div className="form-group">
-                  <label className="form-label">Observaciones {modal === 'rechazar' ? <span className="required">*</span> : '(opcional)'}</label>
-                  <textarea className="form-textarea" value={form.observaciones}
+                  <label className="form-label" htmlFor="textarea-obs">Observaciones {modal === 'rechazar' ? <span className="required" aria-label="Requerido">*</span> : '(opcional)'}</label>
+                  <textarea id="textarea-obs" className="form-textarea" value={form.observaciones}
                     onChange={e => setForm(f => ({ ...f, observaciones: e.target.value }))}
                     placeholder={modal === 'rechazar' ? 'Explique el motivo del rechazo...' : 'Notas adicionales...'} rows={3} />
                 </div>
@@ -408,7 +429,7 @@ export default function SolicitudDetailPage() {
                   (modal === 'reagendar' && newDateCheck?.disponibles === 0)
                 }
               >
-                {saving ? <><span className="spinner spinner-sm" /> Guardando...</> : 'Confirmar'}
+                {saving ? <><span className="spinner spinner-sm" aria-hidden="true" /> Guardando...</> : 'Confirmar'}
               </button>
             </div>
           </div>

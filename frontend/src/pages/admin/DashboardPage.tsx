@@ -26,40 +26,56 @@ export default function DashboardPage() {
 
   return (
     <>
-      <h1 className="page-title">Panel de Control</h1>
+      <h1 className="page-title" id="page-heading">Panel de Control</h1>
       <p className="page-subtitle">Resumen de actividad del sistema de vehículos</p>
 
-      <div className="metrics-grid">
-        <div className="metric-card">
-          <span className="metric-label">Solicitudes Pendientes</span>
-          <span className="metric-value" style={{ color: 'var(--color-warning)' }}>{resumen?.pendientes ?? '—'}</span>
+      {/* Screen Reader Summary */}
+      <section className="sr-only" aria-labelledby="sr-summary-heading">
+        <h2 id="sr-summary-heading">Resumen del sistema para asistencia</h2>
+        <p>
+          Actualmente hay {resumen?.pendientes ?? 0} solicitudes pendientes que requieren su atención. 
+          Hoy tenemos {resumen?.en_campo_hoy ?? 0} vehículos en comisión. 
+          En este mes se han procesado {resumen?.total_mes ?? 0} solicitudes en total.
+        </p>
+      </section>
+
+      <ul className="metrics-grid" role="list" aria-label="Indicadores clave de desempeño">
+        <li className="metric-card">
+          <span className="metric-label" id="label-pendientes">Solicitudes Pendientes</span>
+          <span className="metric-value" style={{ color: 'var(--color-warning)' }} aria-labelledby="label-pendientes">{resumen?.pendientes ?? '—'}</span>
           <span className="metric-sub">Requieren revisión</span>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">Vehículos en Campo Hoy</span>
-          <span className="metric-value" style={{ color: 'var(--color-primary)' }}>{resumen?.en_campo_hoy ?? '—'}</span>
+        </li>
+        <li className="metric-card">
+          <span className="metric-label" id="label-campo">Vehículos en Campo Hoy</span>
+          <span className="metric-value" style={{ color: 'var(--color-primary)' }} aria-labelledby="label-campo">{resumen?.en_campo_hoy ?? '—'}</span>
           <span className="metric-sub">Comisiones activas</span>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">Total Solicitudes Mes</span>
-          <span className="metric-value">{resumen?.total_mes ?? '—'}</span>
+        </li>
+        <li className="metric-card">
+          <span className="metric-label" id="label-total">Total Solicitudes Mes</span>
+          <span className="metric-value" aria-labelledby="label-total">{resumen?.total_mes ?? '—'}</span>
           <span className="metric-sub">Mes actual</span>
-        </div>
-      </div>
+        </li>
+      </ul>
 
       <div className="card">
         <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>⏳ Solicitudes Pendientes de Revisión</span>
-          <button className="btn btn-outline btn-sm" onClick={() => navigate('/admin/solicitudes')}>Ver todas</button>
+          <span id="title-pendientes">⏳ Solicitudes Pendientes de Revisión</span>
+          <button className="btn btn-outline btn-sm" onClick={() => navigate('/admin/solicitudes')} aria-label="Ver todas las solicitudes">Ver todas</button>
         </div>
         <div className="table-wrapper">
           {pendientes.length === 0 ? (
-            <div className="empty-state"><div className="empty-state-icon">✅</div><p>No hay solicitudes pendientes</p></div>
+            <div className="empty-state" role="status"><div className="empty-state-icon">✅</div><p>No hay solicitudes pendientes</p></div>
           ) : (
-            <table className="table">
+            <table className="table" aria-labelledby="title-pendientes">
               <thead>
                 <tr>
-                  <th>#</th><th>Dependencia</th><th>Destino</th><th>Fecha Salida</th><th>Líder</th><th>Estado</th><th></th>
+                  <th scope="col">#</th>
+                  <th scope="col">Dependencia</th>
+                  <th scope="col">Destino</th>
+                  <th scope="col">Fecha Salida</th>
+                  <th scope="col">Líder</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col"><span className="sr-only">Acciones</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -72,7 +88,13 @@ export default function DashboardPage() {
                     <td>{s.lider_dependencia}</td>
                     <td><span className={`badge ${BADGE_CLASS[s.estado] || ''}`}>{s.estado}</span></td>
                     <td>
-                      <button className="btn btn-primary btn-sm" onClick={() => navigate(`/admin/solicitudes/${s.id}`)}>Ver</button>
+                      <button 
+                        className="btn btn-primary btn-sm" 
+                        onClick={() => navigate(`/admin/solicitudes/${s.id}`)}
+                        aria-label={`Ver detalles de solicitud número ${s.id}`}
+                      >
+                        Ver
+                      </button>
                     </td>
                   </tr>
                 ))}

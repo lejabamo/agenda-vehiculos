@@ -46,7 +46,7 @@ export default function VehiculosPage() {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <div>
-          <h1 className="page-title">Vehículos</h1>
+          <h1 className="page-title" id="page-heading">Vehículos</h1>
           <p className="page-subtitle">Gestión de la flota institucional</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -54,14 +54,24 @@ export default function VehiculosPage() {
             <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
             Mostrar inactivos
           </label>
-          <button className="btn btn-primary" onClick={openNew}>+ Nuevo Vehículo</button>
+          <button className="btn btn-primary" onClick={openNew} aria-label="Registrar un nuevo vehículo">+ Nuevo Vehículo</button>
         </div>
       </div>
 
       <div className="card">
         <div className="table-wrapper">
-          <table className="table">
-            <thead><tr><th>Placa</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Color</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <table className="table" aria-labelledby="page-heading">
+            <thead>
+              <tr>
+                <th scope="col">Placa</th>
+                <th scope="col">Marca</th>
+                <th scope="col">Modelo</th>
+                <th scope="col">Año</th>
+                <th scope="col">Color</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span className="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
             <tbody>
               {filteredVehiculos.map(v => (
                 <tr key={v.id}>
@@ -71,45 +81,91 @@ export default function VehiculosPage() {
                   <td>{v.anio || '—'}</td>
                   <td>{v.color || '—'}</td>
                   <td>
-                    <span className={`badge ${v.activo ? 'badge-aprobado' : 'badge-cancelado'}`}>
+                    <span className={`badge ${v.activo ? 'badge-aprobado' : 'badge-cancelado'}`} aria-label={`Estado: ${v.activo ? 'Activo' : 'Inactivo'}`}>
                       {v.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn btn-outline btn-sm" onClick={() => { setForm({ placa: v.placa, marca: v.marca, modelo: v.modelo, anio: String(v.anio || ''), color: v.color || '' }); setEditId(v.id); setModal(true) }}>Editar</button>
-                    <button className={`btn btn-sm ${v.activo ? 'btn-ghost' : 'btn-success'}`} onClick={() => toggleActivo(v)}>{v.activo ? 'Desactivar' : 'Activar'}</button>
+                    <button 
+                      className="btn btn-outline btn-sm" 
+                      onClick={() => { setForm({ placa: v.placa, marca: v.marca, modelo: v.modelo, anio: String(v.anio || ''), color: v.color || '' }); setEditId(v.id); setModal(true) }}
+                      aria-label={`Editar vehículo con placa ${v.placa}`}
+                    >
+                      Editar
+                    </button>
+                    <button 
+                      className={`btn btn-sm ${v.activo ? 'btn-ghost' : 'btn-success'}`} 
+                      onClick={() => toggleActivo(v)}
+                      aria-label={v.activo ? `Desactivar vehículo ${v.placa}` : `Activar vehículo ${v.placa}`}
+                    >
+                      {v.activo ? 'Desactivar' : 'Activar'}
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {vehiculos.length === 0 && <div className="empty-state"><div className="empty-state-icon">🚗</div><p>No hay vehículos registrados</p></div>}
+          {vehiculos.length === 0 && (
+            <div className="empty-state" role="status">
+              <div className="empty-state-icon" aria-hidden="true">🚗</div>
+              <p>No hay vehículos registrados</p>
+            </div>
+          )}
         </div>
       </div>
 
       {modal && (
-        <div className="modal-overlay" onClick={() => setModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setModal(false)} role="presentation">
+          <div className="modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div className="modal-header">
-              <span className="modal-title">{editId ? 'Editar Vehículo' : 'Nuevo Vehículo'}</span>
-              <button className="btn btn-ghost btn-sm" onClick={() => setModal(false)}>✕</button>
+              <span className="modal-title" id="modal-title">{editId ? 'Editar Vehículo' : 'Nuevo Vehículo'}</span>
+              <button className="btn btn-ghost btn-sm" onClick={() => setModal(false)} aria-label="Cerrar modal">✕</button>
             </div>
             <div className="modal-body">
-              {error && <div style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: 8, marginBottom: '1rem', fontSize: '0.875rem' }}>⚠️ {error}</div>}
+              <div aria-live="polite">
+                {error && <div role="alert" style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: 8, marginBottom: '1rem', fontSize: '0.875rem' }}>⚠️ {error}</div>}
+              </div>
+              
               <div className="form-row">
-                <div className="form-group"><label className="form-label">Placa <span className="required">*</span></label><input className="form-input" value={form.placa} onChange={e => setForm(f => ({ ...f, placa: e.target.value.toUpperCase() }))} placeholder="ABC123" /></div>
-                <div className="form-group"><label className="form-label">Color</label><input className="form-input" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} placeholder="Blanco" /></div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-placa">Placa <span className="required" aria-label="Requerido">*</span></label>
+                  <input id="input-placa" className="form-input" value={form.placa} onChange={e => setForm(f => ({ ...f, placa: e.target.value.toUpperCase() }))} placeholder="ABC123" aria-required="true" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-color">Color</label>
+                  <input id="input-color" className="form-input" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} placeholder="Blanco" />
+                </div>
               </div>
               <div className="form-row">
-                <div className="form-group"><label className="form-label">Marca <span className="required">*</span></label><input className="form-input" value={form.marca} onChange={e => setForm(f => ({ ...f, marca: e.target.value }))} placeholder="Toyota" /></div>
-                <div className="form-group"><label className="form-label">Modelo <span className="required">*</span></label><input className="form-input" value={form.modelo} onChange={e => setForm(f => ({ ...f, modelo: e.target.value }))} placeholder="Hilux" /></div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-marca">Marca <span className="required" aria-label="Requerido">*</span></label>
+                  <input id="input-marca" className="form-input" value={form.marca} onChange={e => setForm(f => ({ ...f, marca: e.target.value }))} placeholder="Toyota" aria-required="true" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-modelo">Modelo <span className="required" aria-label="Requerido">*</span></label>
+                  <input id="input-modelo" className="form-input" value={form.modelo} onChange={e => setForm(f => ({ ...f, modelo: e.target.value }))} placeholder="Hilux" aria-required="true" />
+                </div>
               </div>
-              <div className="form-group"><label className="form-label">Año</label><input type="number" className="form-input" value={form.anio} onChange={e => setForm(f => ({ ...f, anio: e.target.value }))} placeholder="2022" min="2000" max="2030" /></div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="input-anio">Año</label>
+                <input id="input-anio" type="number" className="form-input" value={form.anio} onChange={e => setForm(f => ({ ...f, anio: e.target.value }))} placeholder="2022" min="2000" max="2030" />
+              </div>
+
+              {(!form.placa || !form.marca || !form.modelo) && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.5rem' }} role="status">
+                  Complete los campos obligatorios (*) para habilitar el guardado.
+                </div>
+              )}
             </div>
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={() => setModal(false)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={handleSave} disabled={saving || !form.placa || !form.marca || !form.modelo}>
-                {saving ? 'Guardando...' : 'Guardar'}
+              <button 
+                className="btn btn-primary" 
+                onClick={handleSave} 
+                disabled={saving || !form.placa || !form.marca || !form.modelo}
+                aria-label={editId ? "Guardar cambios del vehículo" : "Crear nuevo vehículo"}
+              >
+                {saving ? <span role="status">Guardando...</span> : 'Guardar'}
               </button>
             </div>
           </div>

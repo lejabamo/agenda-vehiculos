@@ -72,18 +72,21 @@ export default function LoginPage() {
             <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Ingrese sus credenciales administrativas</p>
           </div>
 
-          {error && (
-            <div style={{ background: '#fef2f2', color: '#dc2626', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', fontWeight: 600, border: '1px solid #fee2e2' }}>
-              ⚠️ {error}
-            </div>
-          )}
+          <div aria-live="assertive" role="alert">
+            {error && (
+              <div style={{ background: '#fef2f2', color: '#dc2626', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', fontWeight: 600, border: '1px solid #fee2e2' }}>
+                ⚠️ {error}
+              </div>
+            )}
+          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-              <label className="form-label" style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Usuario / Correo Electrónico</label>
+              <label htmlFor="login-email" className="form-label" style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Usuario / Correo Electrónico</label>
               <div style={{ position: 'relative' }}>
-                 <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>@</span>
+                 <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} aria-hidden="true">@</span>
                  <input
+                  id="login-email"
                   type="email"
                   className="form-input"
                   style={{ paddingLeft: '2.5rem', height: '52px', borderRadius: '12px', border: '1.5px solid #e2e8f0' }}
@@ -91,14 +94,16 @@ export default function LoginPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
             <div className="form-group" style={{ marginBottom: '2rem' }}>
-              <label className="form-label" style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Contraseña</label>
+              <label htmlFor="login-password" className="form-label" style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Contraseña</label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>🔒</span>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} aria-hidden="true">🔒</span>
                 <input
+                  id="login-password"
                   type="password"
                   className="form-input"
                   style={{ paddingLeft: '2.5rem', height: '52px', borderRadius: '12px', border: '1.5px solid #e2e8f0' }}
@@ -106,6 +111,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
@@ -115,8 +121,9 @@ export default function LoginPage() {
               className="btn btn-primary btn-full btn-lg" 
               disabled={loading} 
               style={{ height: '54px', borderRadius: '12px', background: '#0f172a', fontSize: '1rem', boxShadow: '0 10px 15px -3px rgba(15,23,42,0.3)' }}
+              aria-label={loading ? "Iniciando sesión..." : "Ingresar al sistema administrativo"}
             >
-              {loading ? 'Verificando...' : 'Ingresar al Sistema'}
+              {loading ? <span role="status">Verificando...</span> : 'Ingresar al Sistema'}
             </button>
             <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
               <a href="#" style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>¿Olvidaste tu contraseña?</a>
